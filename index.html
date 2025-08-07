@@ -1,51 +1,34 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.5">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Apartment Site</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"/&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;My Apartment Site&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="stylesheet" href="style.css" /&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="room"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;img src="room.png" usemap="#apartment-map" alt="Apartment" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;map name="apartment-map"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;area shape="rect" coords="80,500,500,740" alt="Bed" onclick="showContent('bed')" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;area shape="rect" coords="600,400,680,460" alt="Laptop" onclick="showContent('laptop')" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;area shape="rect" coords="580,420,800,500" alt="Desk" onclick="showContent('desk')" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;area shape="rect" coords="850,420,1020,720" alt="Bookshelf" onclick="showContent('bookshelf')" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;area shape="rect" coords="640,200,950,400" alt="Window" onclick="showContent('window')" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;area shape="rect" coords="50,220,240,500" alt="Closet" onclick="showContent('closet')" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;area shape="rect" coords="1040,250,1120,340" alt="Mirror" onclick="showContent('mirror')" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;area shape="rect" coords="250,270,430,380" alt="TV" onclick="showContent('tv')" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;area shape="rect" coords="960,700,1040,760" alt="Drawer" onclick="showContent('drawer')" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/map&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="content-modal" class="hidden"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="modal-box"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;span id="close-btn" onclick="hideContent()"&gt;×&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="modal-content"&gt;Placeholder&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="script.js"&gt;&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
-<p class="p2"><br></p>
+  <div id="room">
+    <img src="room.png" usemap="#apartment-map" alt="Apartment" />
+    <map name="apartment-map">
+      <area shape="rect" coords="80,500,500,740" alt="Bed" onclick="showContent('bed')" />
+      <area shape="rect" coords="600,400,680,460" alt="Laptop" onclick="showContent('laptop')" />
+      <area shape="rect" coords="580,420,800,500" alt="Desk" onclick="showContent('desk')" />
+      <area shape="rect" coords="850,420,1020,720" alt="Bookshelf" onclick="showContent('bookshelf')" />
+      <area shape="rect" coords="640,200,950,400" alt="Window" onclick="showContent('window')" />
+      <area shape="rect" coords="50,220,240,500" alt="Closet" onclick="showContent('closet')" />
+      <area shape="rect" coords="1040,250,1120,340" alt="Mirror" onclick="showContent('mirror')" />
+      <area shape="rect" coords="250,270,430,380" alt="TV" onclick="showContent('tv')" />
+      <area shape="rect" coords="960,700,1040,760" alt="Drawer" onclick="showContent('drawer')" />
+    </map>
+  </div>
+
+  <div id="content-modal" class="hidden">
+    <div id="modal-box">
+      <span id="close-btn" onclick="hideContent()">×</span>
+      <div id="modal-content">Placeholder</div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
