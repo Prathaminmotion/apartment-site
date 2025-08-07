@@ -7,25 +7,30 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="room">
-    <img src="room.png" usemap="#apartment-map" alt="Apartment" />
+  <main id="room-container">
+    <img
+      id="room-image"
+      src="room.png"
+      usemap="#apartment-map"
+      alt="Interactive apartment room"
+    />
     <map name="apartment-map">
-      <area shape="rect" coords="80,500,500,740" alt="Bed" onclick="showContent('bed')" />
-      <area shape="rect" coords="600,400,680,460" alt="Laptop" onclick="showContent('laptop')" />
-      <area shape="rect" coords="580,420,800,500" alt="Desk" onclick="showContent('desk')" />
+      <area shape="rect" coords="80,500,500,740"   alt="Bed"     onclick="showContent('bed')" />
+      <area shape="rect" coords="600,400,680,460"  alt="Laptop"  onclick="showContent('laptop')" />
+      <area shape="rect" coords="580,420,800,500"  alt="Desk"    onclick="showContent('desk')" />
       <area shape="rect" coords="850,420,1020,720" alt="Bookshelf" onclick="showContent('bookshelf')" />
-      <area shape="rect" coords="640,200,950,400" alt="Window" onclick="showContent('window')" />
-      <area shape="rect" coords="50,220,240,500" alt="Closet" onclick="showContent('closet')" />
-      <area shape="rect" coords="1040,250,1120,340" alt="Mirror" onclick="showContent('mirror')" />
-      <area shape="rect" coords="250,270,430,380" alt="TV" onclick="showContent('tv')" />
-      <area shape="rect" coords="960,700,1040,760" alt="Drawer" onclick="showContent('drawer')" />
+      <area shape="rect" coords="640,200,950,400"  alt="Window"  onclick="showContent('window')" />
+      <area shape="rect" coords="50,220,240,500"   alt="Closet"  onclick="showContent('closet')" />
+      <area shape="rect" coords="1040,250,1120,340" alt="Mirror"  onclick="showContent('mirror')" />
+      <area shape="rect" coords="250,270,430,380"  alt="TV"      onclick="showContent('tv')" />
+      <area shape="rect" coords="960,700,1040,760" alt="Drawer"  onclick="showContent('drawer')" />
     </map>
-  </div>
+  </main>
 
-  <!-- Hidden modal until activated -->
-  <div id="content-modal" class="hidden">
-    <div id="modal-box">
-      <span id="close-btn" onclick="hideContent()">×</span>
+  <!-- Modal -->
+  <div id="content-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div id="modal-box" role="document">
+      <button id="close-btn" aria-label="Close" onclick="hideContent()">×</button>
       <div id="modal-content">Placeholder</div>
     </div>
   </div>
