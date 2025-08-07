@@ -11,10 +11,10 @@ function showContent(zone) {
     drawer: "🔐 Secret vault — hidden files, soul system, unreleased ideas."
   };
 
-  document.getElementById('modal-content').innerText = content[zone] || "No content found.";
-  document.getElementById('content-modal').classList.remove('hidden');
+  document.getElementById("modal-content").innerText = content[zone] || "No content found.";
+  document.getElementById("content-modal").style.display = "flex";
 }
 
 function hideContent() {
-  document.getElementById('content-modal').classList.add('hidden');
+  document.getElementById("content-modal").style.display = "none";
 }
