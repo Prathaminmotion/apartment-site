@@ -1,25 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Interactive Apartment</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main id="room-container">
-    <img id="room-image" src="room.png" alt="Interactive apartment room">
-    <!-- Transparent hotspots -->
-    <div class="hotspot" data-zone="bed"></div>
-    <div class="hotspot" data-zone="clothes"></div>
-    <div class="hotspot" data-zone="vault"></div>
-    <div class="hotspot" data-zone="tv"></div>
-    <div class="hotspot" data-zone="art"></div>
-    <div class="hotspot" data-zone="window"></div>
-    <div class="hotspot" data-zone="laptop"></div>
-    <div class="hotspot" data-zone="desk"></div>
-    <div class="hotspot" data-zone="bookshelf"></div>
-    <div class="hotspot" data-zone="mirror"></div>
+    <img id="room-image" src="room.png" alt="Interactive apartment room" />
+
+    <!-- Dots placed at the CENTER of each annotated zone -->
+    <span class="dot dot-bed"      data-zone="bed"      data-label="Bed"></span>
+    <span class="dot dot-clothes"  data-zone="clothes"  data-label="Closet"></span>
+    <span class="dot dot-vault"    data-zone="vault"    data-label="Vault"></span>
+    <span class="dot dot-tv"       data-zone="tv"       data-label="TV"></span>
+    <span class="dot dot-art"      data-zone="art"      data-label="Artwork"></span>
+    <span class="dot dot-window"   data-zone="window"   data-label="Window"></span>
+    <span class="dot dot-laptop"   data-zone="laptop"   data-label="Laptop"></span>
+    <span class="dot dot-desk"     data-zone="desk"     data-label="Desk"></span>
+    <span class="dot dot-bookshelf"data-zone="bookshelf"data-label="Bookshelf"></span>
+    <span class="dot dot-mirror"   data-zone="mirror"   data-label="Mirror"></span>
   </main>
 
   <!-- Modal -->
