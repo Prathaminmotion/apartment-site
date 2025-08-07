@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF‑8">
+  <meta name="viewport" content="width=device‑width, initial‑scale=1">
+  <title>Bookshelf</title>
+  <link rel="stylesheet" href="bookshelf.css">
+</head>
+<body>
+  <div class="shelf-container">
+    <img src="bookshelf.png" alt="Bookshelf" class="bookshelf-img">
+    <div id="pullout" class="pullout hidden">
+      <h2 id="pull-title"></h2>
+      <h3 id="pull-author"></h3>
+      <p id="pull-synopsis"></p>
+      <button id="close-pull">Close</button>
+    </div>
+    <div id="list‑dot" class="list‑dot" title="Show all books"></div>
+  </div>
+
+  <div id="list-popup" class="list-popup hidden">
+    <div class="list-content">
+      <button id="close-list">✕</button>
+      <ul id="book-list"></ul>
+    </div>
+  </div>
+
+  <script src="bookshelf.js"></script>
+</body>
+</html>
