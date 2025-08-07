@@ -1,4 +1,4 @@
-/* Reset & Base */
+/* Base reset */
 *,
 *::before,
 *::after {
@@ -13,8 +13,9 @@ html, body {
   height: 100%;
 }
 
-/* Room container */
+/* Room container & image */
 #room-container {
+  position: relative;
   text-align: center;
 }
 #room-image {
@@ -22,16 +23,57 @@ html, body {
   height: auto;
   display: block;
   margin: 0 auto;
-  cursor: crosshair; /* indicates clickability */
+}
+
+/* Hotspot base style */
+.hotspot {
+  position: absolute;
+  background: rgba(0,0,0,0.02);
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.hotspot:hover {
+  background: rgba(255,255,255,0.1);
+  box-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+/* Zone coordinates (in px) */
+.hotspot[data-zone="bed"] {
+  left: 60px; top: 500px; width: 440px; height: 240px;
+}
+.hotspot[data-zone="clothes"] {
+  left: 70px; top: 230px; width: 190px; height: 270px;
+}
+.hotspot[data-zone="vault"] {
+  left: 75px; top: 510px; width: 155px; height: 70px;
+}
+.hotspot[data-zone="tv"] {
+  left: 275px; top: 290px; width: 185px; height: 80px;
+}
+.hotspot[data-zone="art"] {
+  left: 285px; top: 130px; width: 125px; height: 120px;
+}
+.hotspot[data-zone="window"] {
+  left: 620px; top: 80px; width: 330px; height: 310px;
+}
+.hotspot[data-zone="laptop"] {
+  left: 650px; top: 380px; width: 100px; height: 90px;
+}
+.hotspot[data-zone="desk"] {
+  left: 570px; top: 420px; width: 270px; height: 120px;
+}
+.hotspot[data-zone="bookshelf"] {
+  left: 880px; top: 450px; width: 170px; height: 170px;
+}
+.hotspot[data-zone="mirror"] {
+  left: 1050px; top: 190px; width: 90px; height: 160px;
 }
 
 /* Modal overlay */
 #content-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
   background: rgba(0,0,0,0.8);
   display: none;
   justify-content: center;
@@ -55,8 +97,7 @@ html, body {
 /* Close button */
 #close-btn {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: 0.5rem; right: 0.5rem;
   background: transparent;
   border: none;
   color: #eee;
@@ -73,16 +114,9 @@ html, body {
 
 /* Animations */
 @keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from { opacity: 0; } to { opacity: 1; }
 }
 @keyframes slideIn {
   from { transform: translateY(-20px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  to   { transform: translateY(0);     opacity: 1; }
 }
-
-area {
-  cursor: default; /* makes cursor consistent, hides interactivity */
-}
-
-
