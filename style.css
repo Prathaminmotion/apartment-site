@@ -1,20 +1,31 @@
-body {
+/* Reset & Base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html, body {
   margin: 0;
+  padding: 0;
   background: #111;
+  color: #eee;
   font-family: Arial, sans-serif;
+  height: 100%;
 }
 
-#room {
-  position: relative;
+/* Room container */
+#room-container {
   text-align: center;
 }
-
-#room img {
+#room-image {
   max-width: 100%;
   height: auto;
+  display: block;
+  margin: 0 auto;
+  cursor: crosshair; /* indicates clickability */
 }
 
-/* Modal */
+/* Modal overlay */
 #content-modal {
   position: fixed;
   top: 0;
@@ -22,31 +33,50 @@ body {
   width: 100vw;
   height: 100vh;
   background: rgba(0,0,0,0.8);
-  display: none; /* Hidden by default */
+  display: none;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeInOverlay 0.3s ease-out;
 }
 
+/* Modal box */
 #modal-box {
   background: #222;
-  color: white;
-  padding: 20px;
+  padding: 1.5rem;
+  border-radius: 8px;
   width: 90%;
   max-width: 600px;
-  border-radius: 10px;
   position: relative;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  animation: slideIn 0.3s ease-out;
 }
 
+/* Close button */
 #close-btn {
   position: absolute;
-  top: 10px;
-  right: 15px;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #eee;
+  font-size: 1.5rem;
   cursor: pointer;
-  font-size: 24px;
-  font-weight: bold;
+  line-height: 1;
 }
 
-.hidden {
-  display: none !important;
+/* Modal content */
+#modal-content {
+  margin-top: 1rem;
+  line-height: 1.5;
+}
+
+/* Animations */
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
 }
