@@ -1,17 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Laptop Terminal</title>
-  <link rel="stylesheet" href="laptop.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Laptop Terminal</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#0f141b; --text:#e6edf3; --muted:#97a3b6; --accent:#7dd3fc;
+    --radius:14px; --shadow:0 10px 30px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+
+  .wrap{max-width:980px;margin:0 auto;padding:16px}
+  .terminal{background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);box-shadow:var(--shadow);min-height:70vh;display:flex;flex-direction:column;overflow:hidden}
+  .bar{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;border-bottom:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(255,255,255,.04),transparent)}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .dot.red{background:#ff5f56}.dot.yellow{background:#ffbd2e}.dot.green{background:#27c93f}
+  .title{color:var(--muted);font-weight:600}
+  .screen{flex:1;overflow:auto;padding:14px}
+  .line{display:flex;gap:.6rem;align-items:flex-start}
+  .prompt{color:#8adaff;white-space:pre}
+  .out{white-space:pre-wrap}
+
+  .inputRow{display:flex;gap:.6rem;align-items:center;border-top:1px solid rgba(255,255,255,.06);padding:.6rem .7rem;background:linear-gradient(0deg,rgba(255,255,255,.04),transparent)}
+  .prefix{color:#8adaff;user-select:none}
+  #cmd{flex:1;background:transparent;color:var(--text);border:0;outline:0;font:inherit}
+
+  .help{color:#b6c2d1}
+  a{color:var(--accent);text-decoration:none}
+  code{background:#0b0f14;border:1px solid rgba(255,255,255,.06);padding:.12rem .28rem;border-radius:6px}
+
+  .kbd{display:inline-block;border:1px solid rgba(255,255,255,.15);padding:.12rem .32rem;border-radius:6px;background:#0b0f14;color:#cbd5e1}
+
+  .hint{color:var(--muted);font-size:12px;padding:.45rem .7rem;border-top:1px dashed rgba(255,255,255,.08)}
+
+  @media (max-width:640px){ .wrap{padding:8px} .title{font-size:12px} }
+</style>
 </head>
-<body class="dark">
-  <div id="terminal" class="terminal"></div>
-  <div class="input-container">
-    <span class="prompt">$</span>
-    <input type="text" id="commandInput" autocomplete="off" placeholder="Enter a command..." />
+<body>
+<div class="wrap">
+  <div class="terminal" role="application" aria-label="Pratham Personal Console">
+    <div class="bar">
+      <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+      <span class="title">Pratham Personal Console — type <code>/help</code></span>
+    </div>
+    <div id="screen" class="screen" tabindex="0" aria-live="polite"></div>
+    <div class="inputRow">
+      <span class="prefix" id="prefix">ppc&gt;</span>
+      <input id="cmd" autocomplete="off" spellcheck="false" aria-label="Command input" />
+    </div>
+    <div class="hint">▲▼ history • <span class="kbd">Tab</span> autocomplete • <span class="kbd">/exit</span> to return to <code>index.html</code></div>
   </div>
-  <script src="laptop.js"></script>
+</div>
+
+<script>
+  // ---------- data the site already decided on ----------
+  const BOOKS = [
+    'Rick Riordan — The Lightning Thief',
+    "Michael Crichton — Jurassic Park",
+    "J.K. Rowling — Harry Potter and the Sorcerer's Stone",
+    'Tui T. Sutherland — Wings of Fire',
+    'Jeff Kinney — Diary of a Wimpy Kid',
+    'Lincoln Peirce — Big Nate'
+  ];
+
+  const LINKS = [
+    {label:'Detroit Pharmacy #1', url:'#'},
+    {label:'Detroit Pharmacy #2', url:'#'},
+    {label:'Detroit Pharmacy #3', url:'#'},
+    {label:'Autism Systems Foundation', url:'#'}
+  ];
+
+  const ABOUT = `Pratham — a calm, helpful, get-stuff-done assistant living inside your site.\nUse this console to explore, leave notes, and trigger little utilities.`;
+
+  const KEON = `Keon, Monk of Peace (Leboros). Corrupted then redeemed; powers revolve around souls, healing, and unity. Silent Hand manifesto abridged: help the unseen, forgive when possible, protect when needed.`;
+
+  // ---------- terminal core ----------
+  const screen = document.getElementById('screen');
+  const input = document.getElementById('cmd');
+  const prefixEl = document.getElementById('prefix');
+
+  let history = JSON.parse(localStorage.getItem('ppc_history')||'[]');
+  let histIdx = history.length;
+
+  const commands = {
+    '/help': {
+      desc: 'List commands',
+      run(){
+        print(`Commands:\n`+
+`/help               — show this help\n`+
+`/clear              — clear the screen\n`+
+`/about              — about Pratham\n`+
+`/contact            — email & phone\n`+
+`/links              — pharmacy + foundation links\n`+
+`/reading            — random book pick\n`+
+`/fav-tech           — your tech stack\n`+
+`/echo <text>        — print text\n`+
+`/systeminfo         — browser + OS info\n`+
+`/theme <dark|light> — toggle theme\n`+
+`/game               — tiny number guesser\n`+
+`/keon               — lore snippet\n`+
+`/exit               — go back to index.html`, 'help');
+      }
+    },
+    '/clear': { desc: 'Clear the console', run(){ screen.innerHTML=''; } },
+    '/about': { desc: 'About this console', run(){ print(ABOUT); } },
+    '/contact': { desc: 'Show contact', run(){ print('Email: prathaminmotion@outlook.com\nPhone: (989) 964-1453'); } },
+    '/links': { desc: 'Open links', run(){
+      print(LINKS.map(l=>`• ${l.label} — ${l.url}`).join('\n'));
+    } },
+    '/reading': { desc:'Random book', run(){
+      const pick = BOOKS[Math.floor(Math.random()*BOOKS.length)];
+      print(`Tonight's pull: ${pick}`);
+    } },
+    '/fav-tech': { desc:'Your favorite tech', run(){ print('C# • Visual Studio Code'); } },
+    '/echo': { desc:'Echo text', run(args){ print(args.join(' ')); } },
+    '/systeminfo': { desc:'Show system info', run(){
+      const n = navigator; const d = new Date();
+      print(`User Agent: ${n.userAgent}\nLang: ${n.language}\nPlatform: ${n.platform}\nTime: ${d.toLocaleString()}`);
+    } },
+    '/theme': { desc:'Switch theme', run(args){
+      const mode = (args[0]||'').toLowerCase();
+      if(mode==='light') {
+        document.documentElement.style.setProperty('--bg', '#f6f7f9');
+        document.documentElement.style.setProperty('--panel', '#ffffff');
+        document.documentElement.style.setProperty('--text', '#0b1220');
+        document.documentElement.style.setProperty('--muted', '#334155');
+      } else if(mode==='dark' || mode==='') {
+        document.documentElement.style.setProperty('--bg', '#0b0f14');
+        document.documentElement.style.setProperty('--panel', '#0f141b');
+        document.documentElement.style.setProperty('--text', '#e6edf3');
+        document.documentElement.style.setProperty('--muted', '#97a3b6');
+      } else {
+        print('Usage: /theme <dark|light>');
+      }
+    } },
+    '/game': { desc:'Guessing game', run(){
+      const target = Math.floor(Math.random()*10)+1;
+      print('Guess a number 1-10. Type /guess <n>');
+      commands['/guess'] = { desc:'internal', run(args){
+        const n = parseInt(args[0],10);
+        if(isNaN(n)) return print('Enter a number.');
+        if(n===target){ print('GG! you got it.'); delete commands['/guess']; }
+        else if(n<target) print('Higher'); else print('Lower');
+      }};
+    } },
+    '/keon': { desc:'Keon lore', run(){ print(KEON); } },
+    '/exit': { desc:'Return to index.html', run(){
+      print('Exiting to index.html …');
+      setTimeout(()=>{ window.location.href = 'index.html'; }, 400);
+    } },
+  };
+
+  // ---------- terminal plumbing ----------
+  function print(text, cls){
+    const row = document.createElement('div'); row.className='line';
+    const prompt = document.createElement('span'); prompt.className='prompt'; prompt.textContent = 'ppc>'; // output lines also show prompt
+    const out = document.createElement('div'); out.className='out'; if(cls==='help') out.classList.add('help'); out.textContent = text;
+    row.appendChild(prompt); row.appendChild(out); screen.appendChild(row); screen.scrollTop = screen.scrollHeight;
+  }
+
+  function exec(raw){
+    const trimmed = raw.trim();
+    if(!trimmed) return;
+
+    // echo input line first
+    const echo = document.createElement('div'); echo.className='line';
+    const p = document.createElement('span'); p.className='prompt'; p.textContent = 'ppc>';
+    const t = document.createElement('div'); t.className='out'; t.textContent = trimmed;
+    echo.appendChild(p); echo.appendChild(t); screen.appendChild(echo);
+
+    const [cmd, ...args] = trimmed.split(/\s+/);
+    const match = commands[cmd];
+    if(match) match.run(args);
+    else print(`Unknown command: ${cmd}\nType /help`);
+  }
+
+  input.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){
+      const val = input.value; input.value='';
+      history.push(val); localStorage.setItem('ppc_history', JSON.stringify(history)); histIdx = history.length;
+      exec(val);
+    } else if(e.key==='ArrowUp'){
+      if(histIdx>0){ histIdx--; input.value = history[histIdx]||''; setTimeout(()=> input.setSelectionRange(input.value.length, input.value.length), 0); }
+    } else if(e.key==='ArrowDown'){
+      if(histIdx < history.length){ histIdx++; input.value = history[histIdx]||''; }
+    } else if(e.key==='Tab'){
+      e.preventDefault();
+      const cur = input.value.trim();
+      const keys = Object.keys(commands);
+      const opts = keys.filter(k => k.startsWith(cur));
+      if(opts.length===1) input.value = opts[0] + ' ';
+      else if(opts.length>1) print(opts.join(' '));
+    }
+  });
+
+  // focus ready
+  window.addEventListener('load', ()=>{ input.focus(); print('Welcome to the Pratham Personal Console. Type /help'); });
+
+  // Expose small API for your other pages (optional)
+  window.ppc = { exec, print };
+</script>
 </body>
 </html>
