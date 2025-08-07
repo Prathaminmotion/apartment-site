@@ -1,11 +1,11 @@
 // Replace these with your real content
 const CONTENT = {
-  bed:        "🛏 Your personal bed zone. Swap in dream logs or comfort items.",
+  bed:        "🛏 My personal bed zone. Swap in dream logs or comfort items.",
   clothes:    "👕 Closet: favorite outfits or style moodboard.",
   vault:      "🔐 Secret vault: hidden notes or unreleased ideas.",
-  tv:         "📺 TV: your watchlist and media recommendations.",
+  tv:         "📺 TV: my watchlist and media recommendations.",
   art:        "🖼 Artwork: inspiration gallery or moodboard.",
-  window:     "🌇 Window: your vision board or skyline dreams.",
+  window:     "🌇 Window: my vision board or skyline dreams.",
   laptop:     "💻 Laptop: encrypted diary or code terminal.",
   desk:       "🗂 Desk: resume, portfolio links, project showcase.",
   bookshelf:  "📚 Bookshelf: books, D&D lore, favorite reads.",
@@ -45,3 +45,11 @@ document.addEventListener('keydown', e => {
     hideModal();
   }
 });
+
+// Show corner title after fade-in title disappears
+setTimeout(() => {
+  const corner = document.getElementById('corner-title');
+  if (corner) corner.style.opacity = '1';
+}, 4000); // after 4 seconds total
+
+
