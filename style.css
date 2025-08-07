@@ -1,4 +1,4 @@
-/* Base reset */
+/* Reset + Base */
 *,
 *::before,
 *::after {
@@ -13,7 +13,7 @@ html, body {
   height: 100%;
 }
 
-/* Room container & image */
+/* Container & Image */
 #room-container {
   position: relative;
   text-align: center;
@@ -25,51 +25,59 @@ html, body {
   margin: 0 auto;
 }
 
-/* Hotspot base style */
-.hotspot {
+/* Dot Base Style */
+.dot {
   position: absolute;
-  background: rgba(0,0,0,0.02);
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
+  transition: background 0.3s, transform 0.3s;
 }
-.hotspot:hover {
-  background: rgba(255,255,255,0.1);
-  box-shadow: 0 0 10px rgba(255,255,255,0.3);
-}
-
-/* Zone coordinates (in px) */
-.hotspot[data-zone="bed"] {
-  left: 60px; top: 500px; width: 440px; height: 240px;
-}
-.hotspot[data-zone="clothes"] {
-  left: 70px; top: 230px; width: 190px; height: 270px;
-}
-.hotspot[data-zone="vault"] {
-  left: 75px; top: 510px; width: 155px; height: 70px;
-}
-.hotspot[data-zone="tv"] {
-  left: 275px; top: 290px; width: 185px; height: 80px;
-}
-.hotspot[data-zone="art"] {
-  left: 285px; top: 130px; width: 125px; height: 120px;
-}
-.hotspot[data-zone="window"] {
-  left: 620px; top: 80px; width: 330px; height: 310px;
-}
-.hotspot[data-zone="laptop"] {
-  left: 650px; top: 380px; width: 100px; height: 90px;
-}
-.hotspot[data-zone="desk"] {
-  left: 570px; top: 420px; width: 270px; height: 120px;
-}
-.hotspot[data-zone="bookshelf"] {
-  left: 880px; top: 450px; width: 170px; height: 170px;
-}
-.hotspot[data-zone="mirror"] {
-  left: 1050px; top: 190px; width: 90px; height: 160px;
+.dot:hover {
+  background: rgba(255,255,255,1);
+  transform: translate(-50%, -50%) scale(1.4);
+  z-index: 2;
 }
 
-/* Modal overlay */
+/* Tooltip */
+.dot::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.dot:hover::after {
+  opacity: 1;
+}
+
+/* Positioning each dot at the center of its zone */
+/* (Measured from the annotated image) */
+.dot-bed       { left: 280px;  top: 620px; }
+.dot-clothes   { left: 165px;  top: 365px; }
+.dot-vault     { left: 153px;  top: 545px; }
+.dot-tv        { left: 368px;  top: 330px; }
+.dot-art       { left: 348px;  top: 190px; }
+.dot-window    { left: 785px;  top: 235px; }
+.dot-laptop    { left: 700px;  top: 425px; }
+.dot-desk      { left: 705px;  top: 480px; }
+.dot-bookshelf { left: 965px;  top: 535px; }
+.dot-mirror    { left: 1095px; top: 270px; }
+
+/* Modal Overlay */
 #content-modal {
   position: fixed;
   top: 0; left: 0;
@@ -82,7 +90,7 @@ html, body {
   animation: fadeInOverlay 0.3s ease-out;
 }
 
-/* Modal box */
+/* Modal Box */
 #modal-box {
   background: #222;
   padding: 1.5rem;
@@ -94,7 +102,7 @@ html, body {
   animation: slideIn 0.3s ease-out;
 }
 
-/* Close button */
+/* Close Button */
 #close-btn {
   position: absolute;
   top: 0.5rem; right: 0.5rem;
@@ -106,7 +114,7 @@ html, body {
   line-height: 1;
 }
 
-/* Modal content */
+/* Modal Content */
 #modal-content {
   margin-top: 1rem;
   line-height: 1.5;
@@ -114,7 +122,8 @@ html, body {
 
 /* Animations */
 @keyframes fadeInOverlay {
-  from { opacity: 0; } to { opacity: 1; }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 @keyframes slideIn {
   from { transform: translateY(-20px); opacity: 0; }
