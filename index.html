@@ -30,6 +30,20 @@
       <div id="modal-content">Placeholder</div>
     </div>
   </div>
+  <script>
+// Once the page loads, clicking anywhere on the room image
+// will pop up its (x,y) coordinate relative to the image top-left.
+window.addEventListener('DOMContentLoaded', () => {
+  const img = document.getElementById('room-image');
+  img.style.cursor = 'crosshair';
+  img.addEventListener('click', e => {
+    const rect = img.getBoundingClientRect();
+    const x = Math.round(e.clientX - rect.left);
+    const y = Math.round(e.clientY - rect.top);
+    alert(`Position: x=${x}, y=${y}`);
+  });
+});
+</script>
 
   <script src="script.js"></script>
 </body>
