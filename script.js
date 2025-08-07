@@ -25,6 +25,11 @@ dots.forEach(dot => {
       window.location.href = 'laptop.html';
       return;
     }
+    if (zone === 'bookshelf') {
+      window.location.href = 'bookshelf.html';
+      return;
+    }
+
     const text = CONTENT[zone] || `No content for "${zone}".`;
     contentEl.textContent = text;
     modal.style.display = 'flex';
