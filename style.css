@@ -64,18 +64,29 @@ html, body {
   opacity: 1;
 }
 
-/* Positioning each dot at the center of its zone */
-/* (Measured from the annotated image) */
-.dot-bed       { left: 280px;  top: 620px; }
-.dot-clothes   { left: 165px;  top: 365px; }
-.dot-vault     { left: 153px;  top: 545px; }
-.dot-tv        { left: 368px;  top: 330px; }
-.dot-art       { left: 348px;  top: 190px; }
-.dot-window    { left: 785px;  top: 235px; }
-.dot-laptop    { left: 700px;  top: 425px; }
-.dot-desk      { left: 705px;  top: 480px; }
-.dot-bookshelf { left: 965px;  top: 535px; }
-.dot-mirror    { left: 1095px; top: 270px; }
+/* Updated dot positions */
+
+.dot-window    { left: 907px;  top: 248px; }
+.dot-laptop    { left: 854px;  top: 479px; }
+.dot-desk      { left: 877px;  top: 550px; }
+.dot-mirror    { left:1268px;  top: 317px; }
+.dot-bookshelf { left:1188px;  top: 527px; }
+.dot-bed       { left: 300px;  top: 853px; }
+.dot-clothes   { left: 260px;  top: 349px; }
+.dot-art       { left: 473px;  top: 195px; }
+.dot-tv        { left: 478px;  top: 409px; }
+
+/* Vault is completely hidden—you can still click it but no dot is visible */
+.dot-vault {
+  left: 160px;  /* from your x */
+  top:  651px;  /* from your y (assumed 651) */
+  width: 16px;
+  height: 16px;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer;
+}
+
 
 /* Modal Overlay */
 #content-modal {
