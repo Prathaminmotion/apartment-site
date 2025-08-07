@@ -1,48 +1,51 @@
-body {
+/* Dark / Light theme variables */
+body.dark {
+  --bg: #101010;
+  --text: #00ff99;
+}
+body.light {
+  --bg: #ffffff;
+  --text: #222222;
+}
+
+/* Base */
+html, body {
   margin: 0;
-  background: #101010;
-  color: #00ff99;
+  padding: 0;
+  height: 100%;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
   font-family: monospace;
   display: flex;
   flex-direction: column;
-  height: 100vh;
 }
-
-.screen {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  height: 100%;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.output-area {
-  flex-grow: 1;
+.terminal {
+  flex: 1;
   overflow-y: auto;
-  margin-bottom: 15px;
+  padding: 10px;
+  white-space: pre-wrap;
 }
-
-.line {
-  margin: 4px 0;
-}
-
 .input-container {
   display: flex;
   align-items: center;
+  border-top: 1px solid var(--text);
+  padding: 10px;
 }
-
 .prompt {
-  margin-right: 10px;
+  margin-right: 8px;
 }
-
-input#terminal-input {
-  flex-grow: 1;
+#commandInput {
+  flex: 1;
   background: transparent;
   border: none;
-  border-bottom: 1px solid #00ff99;
-  color: #00ff99;
+  border-bottom: 1px solid var(--text);
+  color: var(--text);
   font-size: 1rem;
-  padding: 6px;
   outline: none;
+}
+.terminal-line.user-input {
+  color: var(--text);
+  font-weight: bold;
 }
