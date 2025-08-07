@@ -7,7 +7,6 @@ const CONTENT = {
   art:        "🖼 Artwork: inspiration gallery or moodboard.",
   window:     "🌇 Window: your vision board or skyline dreams.",
   desk:       "🗂 Desk: resume, portfolio links, project showcase.",
-  bookshelf:  "📚 Bookshelf: books, D&D lore, favorite reads.",
   mirror:     "🪞 Mirror: About Me or poetic personal bio."
 };
 
@@ -17,10 +16,11 @@ const modal     = document.getElementById('content-modal');
 const contentEl = document.getElementById('modal-content');
 const closeBtn  = document.getElementById('close-btn');
 
-// Dot click handler
 dots.forEach(dot => {
   dot.addEventListener('click', () => {
     const zone = dot.getAttribute('data-zone');
+
+
     if (zone === 'laptop') {
       window.location.href = 'laptop.html';
       return;
@@ -30,12 +30,14 @@ dots.forEach(dot => {
       return;
     }
 
+    // Then show modal for the rest
     const text = CONTENT[zone] || `No content for "${zone}".`;
     contentEl.textContent = text;
     modal.style.display = 'flex';
     closeBtn.focus();
   });
 });
+
 
 // Hide modal
 function hideModal() {
