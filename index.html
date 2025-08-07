@@ -1,37 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My Apartment Site</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interactive Apartment</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main id="room-container">
-    <img
-      id="room-image"
-      src="room.png"
-      usemap="#apartment-map"
-      alt="Interactive apartment room"
-    />
-    <map name="apartment-map">
-      <area shape="rect" coords="60,500,500,740"   alt="Bed"        onclick="showContent('bed')" />
-      <area shape="rect" coords="70,230,260,500"   alt="Closet"     onclick="showContent('clothes')" />
-      <area shape="rect" coords="75,510,230,580"   alt="Vault"      onclick="showContent('vault')" />
-      <area shape="rect" coords="275,290,460,370"  alt="TV"         onclick="showContent('tv')" />
-      <area shape="rect" coords="285,130,410,250"  alt="Art"        onclick="showContent('art')" />
-      <area shape="rect" coords="620,80,950,390"   alt="Window"     onclick="showContent('window')" />
-      <area shape="rect" coords="650,380,750,470"  alt="Laptop"     onclick="showContent('laptop')" />
-      <area shape="rect" coords="570,420,840,540"  alt="Desk"       onclick="showContent('desk')" />
-      <area shape="rect" coords="880,450,1050,620" alt="Bookshelf"  onclick="showContent('bookshelf')" />
-      <area shape="rect" coords="1050,190,1140,350" alt="Mirror"    onclick="showContent('mirror')" />
-    </map>
+    <img id="room-image" src="room.png" alt="Interactive apartment room">
+    <!-- Transparent hotspots -->
+    <div class="hotspot" data-zone="bed"></div>
+    <div class="hotspot" data-zone="clothes"></div>
+    <div class="hotspot" data-zone="vault"></div>
+    <div class="hotspot" data-zone="tv"></div>
+    <div class="hotspot" data-zone="art"></div>
+    <div class="hotspot" data-zone="window"></div>
+    <div class="hotspot" data-zone="laptop"></div>
+    <div class="hotspot" data-zone="desk"></div>
+    <div class="hotspot" data-zone="bookshelf"></div>
+    <div class="hotspot" data-zone="mirror"></div>
   </main>
 
   <!-- Modal -->
   <div id="content-modal" aria-hidden="true" role="dialog" aria-modal="true">
     <div id="modal-box" role="document">
-      <button id="close-btn" aria-label="Close" onclick="hideContent()">×</button>
+      <button id="close-btn" aria-label="Close">&times;</button>
       <div id="modal-content">Placeholder</div>
     </div>
   </div>
