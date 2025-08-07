@@ -140,3 +140,52 @@ html, body {
   from { transform: translateY(-20px); opacity: 0; }
   to   { transform: translateY(0);     opacity: 1; }
 }
+
+/* === Cinematic Title === */
+
+#intro-title {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  font-family: 'Georgia', serif;
+  opacity: 0;
+  z-index: 2000;
+  pointer-events: none;
+  animation: titleFadeIn 1.5s ease-out forwards, titleFadeOut 1s ease-in 3s forwards;
+}
+
+@keyframes titleFadeIn {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes titleFadeOut {
+  to { opacity: 0; }
+}
+
+/* === Corner Label === */
+
+#corner-title {
+  position: fixed;
+  top: 25px;
+  left: 30px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: 'Courier New', monospace;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+#corner-title:hover {
+  background: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+}
+
+
