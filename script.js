@@ -46,10 +46,6 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// Show corner title after fade-in title disappears
-setTimeout(() => {
-  const corner = document.getElementById('corner-title');
-  if (corner) corner.style.opacity = '1';
-}, 4000); // after 4 seconds total
+
 
 
