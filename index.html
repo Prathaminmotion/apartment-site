@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Interactive Apartment</title>
+  <title>Room for Growth</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main id="room-container">
     <img id="room-image" src="room.png" alt="Interactive apartment room" />
 
-    <!-- Dots placed at the CENTER of each annotated zone -->
+    <!-- Floating dots -->
     <span class="dot dot-bed"      data-zone="bed"      data-label="Bed"></span>
     <span class="dot dot-clothes"  data-zone="clothes"  data-label="Closet"></span>
     <span class="dot dot-vault"    data-zone="vault"    data-label="Vault"></span>
@@ -30,6 +30,11 @@
       <div id="modal-content">Placeholder</div>
     </div>
   </div>
+
+  <!-- Cinematic fade-in title + corner label -->
+  <div id="intro-title">Room for Growth</div>
+  <div id="corner-title">Room for Growth</div>
+
   <script src="script.js"></script>
 </body>
 </html>
