@@ -3,383 +3,380 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Deluxe Bookshelf</title>
-
-<!-- Handwritten + serif for the paper card; will gracefully fall back if blocked -->
-<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand:wght@400&family=Literata:opsz,wght@14..72,400;14..72,600&display=swap" rel="stylesheet">
-
+<title>Bookshelf</title>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Literata:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0b0e14;            /* page */
-    --ink:#e9e4da;           /* paper text */
-    --paper:#f4ecd8;         /* paper */
-    --paper-edge:#d9cdb2;
-    --wood1:#5b3f2a;
-    --wood2:#875d3b;
-    --wood3:#6a4a31;
-    --shadow:rgba(0,0,0,.45);
-    --accent:#7aa2ff;        /* subtle UI accent */
-    --muted:#9aa4b2;
+    --bg:#0b0e14;
+    --paper:#f4ecd8;
+    --paper-edge:#e1d4b7;
+    --ink:#2a241a;
+    --muted:#6e6354;
+    --ui:#141a24;
+    --ui-b:#232c3b;
+    --shadow:rgba(0,0,0,.5);
   }
+  *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0;
-    background: radial-gradient(1200px 600px at 70% 20%, rgba(255,188,120,.06), transparent 60%),
-                radial-gradient(900px 500px at 35% 75%, rgba(255,188,120,.04), transparent 60%),
-                var(--bg);
-    color:#eee;
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    display:flex; flex-direction:column; gap:18px;
+    background: radial-gradient(1000px 520px at 70% 15%, rgba(255,178,120,.06), transparent 60%), var(--bg);
+    color:#eaeaea;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    overflow-x:hidden;
   }
 
-  /* --- Top bar --- */
-  .toolbar{
-    display:flex; gap:10px; align-items:center;
-    padding:16px clamp(12px, 4vw, 28px) 0;
-    flex-wrap:wrap;
+  /* Header */
+  header{
+    padding:14px 18px 8px;
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
   }
-  .toolbar .title{
-    font-weight:600; opacity:.9; margin-right:auto;
-    letter-spacing:.3px
-  }
-  .field, .btn, select{
-    background:#121720;
-    border:1px solid #212938;
-    color:#d9dfeb;
-    border-radius:999px;
-    padding:10px 14px;
-    outline:none; box-shadow:0 4px 14px rgba(0,0,0,.2) inset;
-  }
-  .field{ width:min(420px, 70vw)}
-  .btn{ cursor:pointer }
-  .btn:active{ transform:translateY(1px) }
+  .crumb{opacity:.8}
+  .hint{margin-left:auto; opacity:.6; font-size:.92rem}
 
-  /* --- Shelf wrapper --- */
-  .shelf-wrap{
-    padding:0 clamp(12px, 4vw, 28px) 40px;
-  }
-
-  /* Wood grain using layered gradients + noise */
-  .shelf{
+  /* Bookshelf background */
+  .frame{
     position:relative;
-    margin:0 auto;
-    max-width:1100px;
-    min-height:210px;
-    border-radius:16px;
-    background:
-      /* vertical faint planks */
-      repeating-linear-gradient(90deg,
-        rgba(0,0,0,.05) 0px, rgba(0,0,0,.05) 2px,
-        transparent 2px, transparent 38px),
-      /* soft vignette */
-      radial-gradient(120% 140% at 20% 0%, rgba(255,214,163,.06), transparent 60%),
-      linear-gradient(180deg, var(--wood2), var(--wood1) 60%, var(--wood3));
-    box-shadow:
-      0 22px 40px var(--shadow),
-      inset 0 1px 0 rgba(255,255,255,.08),
-      inset 0 -8px 18px rgba(0,0,0,.25);
-    padding:24px 22px;
-    display:flex; align-items:flex-end; gap:10px; overflow:hidden;
+    width:min(1050px, 95vw);
+    aspect-ratio: 16/10; /* helps layout while image loads */
+    margin:10px auto 70px;
+    background: #2b2016 url('bookshelf.png') center/cover no-repeat;
+    border-radius: 14px;
+    box-shadow: 0 28px 60px var(--shadow);
+    overflow:hidden;
+  }
+  /* Hotspot rows (4 shelves) */
+  .row{
+    position:absolute; left:3.5%; right:3.5%;
+    height:18.5%;
+    display:grid; grid-template-columns: repeat(16, 1fr);
+    align-items:end; gap:6px;
+  }
+  .row[data-i="0"]{ top:8.5% }   /* top shelf */
+  .row[data-i="1"]{ top:31.5% }
+  .row[data-i="2"]{ top:54.3% }
+  .row[data-i="3"]{ top:77% }    /* bottom shelf */
+
+  /* Clickable “spines” (they just trigger a random pick within the row’s series) */
+  .spine{
+    height:74%;
+    border-radius:7px;
+    background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(0,0,0,.18));
+    opacity:0; /* invisible but hoverable; set to .12 for debugging */
+    cursor:pointer;
+    transition: transform .12s ease, opacity .12s ease;
+  }
+  .spine:hover{ transform: translateY(-3px) }
+
+  /* Series label chips (optional helper) */
+  .chip{
+    position:absolute; left:8px; top:8px;
+    background: rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.15);
+    color:#f3e8d1; padding:4px 8px; font-size:12px; border-radius:999px;
+    backdrop-filter: blur(2px);
   }
 
-  /* subtle top bevel */
-  .shelf:before{
-    content:"";
-    position:absolute; inset:0 0 auto 0; height:18px; border-radius:16px 16px 0 0;
-    background:linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,0));
-    mix-blend-mode:soft-light; pointer-events:none;
-  }
-
-  /* slight lamp glow on right side (to match room art) */
-  .shelf:after{
-    content:"";
-    position:absolute; right:-10%; top:-10%;
-    width:60%; height:140%;
-    background: radial-gradient(500px 280px at 80% 35%, rgba(255,183,120,.18), transparent 65%);
-    pointer-events:none;
-  }
-
-  /* Book spines */
-  .book{
-    --h: 168px;              /* height */
-    height:var(--h);
-    width:54px;
-    border-radius:8px;
-    display:flex; align-items:center; justify-content:center;
-    transform-origin:bottom center;
-    cursor:pointer; user-select:none;
-    position:relative;
-    box-shadow:
-      0 8px 14px rgba(0,0,0,.35),
-      inset 0 1px 0 rgba(255,255,255,.18),
-      inset 0 -8px 12px rgba(0,0,0,.15);
-    transition: transform .18s ease, filter .18s ease;
-  }
-  .book:hover{ transform: translateY(-4px) rotate(-1deg) }
-  .book span{
-    writing-mode:vertical-rl; text-orientation:mixed;
-    transform:rotate(180deg);
-    color:#f4f7ff; font-weight:700; letter-spacing:.4px;
-    text-shadow:0 1px 0 rgba(0,0,0,.35);
-  }
-  /* foil line + worn edges */
-  .book:before{
-    content:"";
-    position:absolute; inset:8px auto 8px 6px; width:3px; border-radius:2px;
-    background:linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.05));
-    opacity:.7; pointer-events:none;
-  }
-  .book:after{
-    content:"";
-    position:absolute; inset:0; border-radius:8px;
-    background:linear-gradient(180deg, transparent, rgba(0,0,0,.25));
-    mix-blend-mode:multiply; pointer-events:none;
-  }
-
-  /* Palette – muted, storybooky */
-  .c-blue   { background: linear-gradient(180deg,#4468b7,#2c4a8f) }
-  .c-purple { background: linear-gradient(180deg,#6b58a9,#4b3e85) }
-  .c-green  { background: linear-gradient(180deg,#4e8b5e,#386b47) }
-  .c-amber  { background: linear-gradient(180deg,#b08a48,#8a6a3a) }
-  .c-teal   { background: linear-gradient(180deg,#3a8e8b,#2e6e6b) }
-  .c-rose   { background: linear-gradient(180deg,#a95c67,#80444f) }
-
-  /* Book-of-the-day ribbon */
-  .ribbon{
-    position:absolute; top:-8px; left:8px;
-    background:#e9c46a; color:#3b2f1e; font-weight:700;
-    padding:4px 8px; border-radius:6px 6px 2px 2px; font-size:12px;
-    box-shadow:0 6px 10px rgba(0,0,0,.25);
-    transform:rotate(-6deg);
-  }
-
-  /* Paper card */
+  /* Paper card (book detail) */
   .card{
-    position:fixed; inset:auto auto 40px 50%;
-    translate:-50% 0;
+    position:fixed; left:50%; bottom:34px; translate:-50% 0;
     width:min(720px, 92vw);
     background:
       linear-gradient(180deg, var(--paper), var(--paper-edge)),
-      repeating-linear-gradient(90deg, rgba(0,0,0,.02) 0, rgba(0,0,0,.02) 2px, transparent 2px, transparent 6px);
-    color:#2a241a;
-    border-radius:14px; padding:18px 18px 14px;
-    box-shadow: 0 28px 60px rgba(0,0,0,.55), 0 2px 0 rgba(255,255,255,.35) inset;
+      repeating-linear-gradient(0deg, rgba(0,0,0,.02) 0, rgba(0,0,0,.02) 2px, transparent 2px, transparent 6px);
+    color:var(--ink);
+    border-radius:14px; padding:18px;
+    box-shadow: 0 32px 70px rgba(0,0,0,.6), inset 0 2px 0 rgba(255,255,255,.4);
     display:none;
+    z-index:50;
   }
   .card.open{ display:block; animation:pop .14s ease-out }
   @keyframes pop{ from{ transform:scale(.98); opacity:0 } to{ transform:scale(1); opacity:1 } }
-
-  .card h2{ margin:.2rem 0 .35rem; font-family:"Literata", serif; font-weight:600 }
-  .meta{ color:#4a4031; margin-bottom:.5rem; font-family:"Literata", serif; font-size:.98rem }
-  .syn{ font-family:"Patrick Hand", ui-rounded, system-ui; color:#2d261b; font-size:1.1rem; line-height:1.35 }
-  .card .row{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap }
-  .tag{
-    background:#efe6cf; color:#54462e; border:1px dashed #cbbd9e;
-    padding:6px 10px; border-radius:999px; font-family:"Patrick Hand";
-  }
-  .close{
-    margin-left:auto; background:#1c2432; color:#dce3f3; border:none;
-    padding:10px 14px; border-radius:10px; cursor:pointer;
-    box-shadow:0 8px 14px rgba(0,0,0,.25);
+  .card h2{ margin:.2rem 0 .25rem; font-family:"Literata", serif; font-weight:600 }
+  .meta{ font-family:"Literata", serif; color:var(--muted); margin-bottom:.4rem }
+  .syn{ font-family:"Patrick Hand", ui-rounded; font-size:1.1rem; color:#2d261b; line-height:1.35 }
+  .rowbtns{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap }
+  .btn{
+    background:var(--ui); color:#dae3f5; border:1px solid var(--ui-b);
+    padding:8px 12px; border-radius:10px; cursor:pointer;
   }
 
-  /* Little props on shelf for vibe */
-  .prop-plant{
-    width:64px; height:64px; position:absolute; right:22px; bottom:158px; pointer-events:none;
-    filter: drop-shadow(0 6px 10px rgba(0,0,0,.35));
-    background:
-      radial-gradient(10px 8px at 50% 90%, #6b4a2e 60%, transparent 61%),
-      radial-gradient(12px 8px at 50% 98%, rgba(0,0,0,.35), transparent 60%);
+  /* All books modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.55);
+    display:none; z-index:60;
   }
-  .prop-plant:before,
-  .prop-plant:after{
-    content:""; position:absolute; inset:auto; left:50%;
-    width:70px; height:70px; translate:-50% 0;
-    background:
-      radial-gradient(60% 60% at 30% 0%, #2a5e3e, transparent 60%),
-      radial-gradient(60% 60% at 70% 30%, #346e4b, transparent 60%),
-      radial-gradient(60% 60% at 45% 80%, #244f36, transparent 60%);
-    border-radius:50%;
-    filter:blur(.4px) saturate(1.05);
+  .overlay.open{ display:block }
+  .panel{
+    position:fixed; left:50%; top:50%; translate:-50% -50%;
+    width:min(900px, 96vw); max-height:80vh; overflow:auto;
+    background:#101520; color:#e7edf6; border:1px solid #2a3446; border-radius:14px;
+    box-shadow: 0 28px 60px rgba(0,0,0,.6);
+    padding:14px;
   }
-  .prop-plant:after{ translate:-50% 8px; opacity:.8 }
+  .panel h3{ margin:6px 0 10px }
+  .controls{ display:flex; gap:10px; align-items:center; margin-bottom:8px; flex-wrap:wrap }
+  select, input{
+    background:#0f141e; color:#dbe4f6; border:1px solid #243049; border-radius:10px; padding:8px 10px;
+  }
+  table{ width:100%; border-collapse:collapse; font-size:.98rem }
+  th, td{ padding:8px 10px; border-bottom:1px solid #1f2837 }
+  th{ text-align:left; color:#a9b6cf; position:sticky; top:0; background:#0f141e }
 
-  /* helper */
-  .spacer{flex:1}
-  .count{ color:var(--muted); font-size:.9rem }
+  /* Dot button */
+  .dot{
+    position:fixed; right:16px; bottom:16px; z-index:40;
+    width:18px; height:18px; border-radius:50%;
+    background:#e9c46a; box-shadow: 0 6px 14px rgba(0,0,0,.45);
+    cursor:pointer;
+  }
+
+  /* Close X */
+  .x{
+    background:#1b2330; border:1px solid #313c52; color:#d9e6ff;
+    border-radius:9px; padding:6px 10px; cursor:pointer; margin-left:auto;
+  }
 </style>
 </head>
 <body>
+  <header>
+    <div class="crumb">📚 Bookshelf</div>
+    <div class="hint">Click any book on a row to get a random pick from that series.</div>
+  </header>
 
-  <div class="toolbar">
-    <div class="title">📚 Deluxe Bookshelf</div>
-    <input id="q" class="field" placeholder="Search books… ( / )" />
-    <select id="sort">
-      <option value="title">Sort: Title</option>
-      <option value="author">Sort: Author</option>
-    </select>
-    <button class="btn" id="shuffle">Shuffle</button>
-    <div class="spacer"></div>
-    <div class="count" id="count"></div>
-  </div>
+  <main class="frame" id="frame">
+    <!-- Series chips (you can change which series maps to which row here) -->
+    <div class="chip" style="top:6%;">Harry Potter</div>
+    <div class="chip" style="top:28.5%;">Percy Jackson & the Olympians</div>
+    <div class="chip" style="top:51.2%;">Wings of Fire (Arc 1)</div>
+    <div class="chip" style="top:74%;">Diary of a Wimpy Kid</div>
 
-  <div class="shelf-wrap">
-    <div class="shelf" id="shelf">
-      <!-- plant prop -->
-      <div class="prop-plant" aria-hidden="true"></div>
-      <!-- books injected here -->
-    </div>
-  </div>
+    <!-- 4 rows of hotspots, each row has 16 “spines” to click -->
+    <div class="row" data-i="0"></div>
+    <div class="row" data-i="1"></div>
+    <div class="row" data-i="2"></div>
+    <div class="row" data-i="3"></div>
+  </main>
 
   <!-- Paper card -->
-  <div id="card" class="card" role="dialog" aria-modal="true">
-    <div style="display:flex; align-items:center; gap:12px">
-      <h2 id="c-title">Title</h2>
-      <span class="meta" id="c-author"></span>
-      <button class="close" id="close">Close</button>
+  <section class="card" id="card">
+    <h2 id="c-title">Title</h2>
+    <div class="meta" id="c-meta">by Author • #1 in Series</div>
+    <p class="syn" id="c-syn">Series synopsis.</p>
+    <div class="rowbtns">
+      <button class="btn" id="another">Another random from this series</button>
+      <button class="btn" id="close">Close</button>
     </div>
-    <p class="syn" id="c-syn"></p>
-    <div class="row" id="c-tags"></div>
+  </section>
+
+  <!-- All books modal -->
+  <div class="overlay" id="ovl">
+    <div class="panel">
+      <div style="display:flex; align-items:center; gap:10px">
+        <h3 style="margin:0">All Books</h3>
+        <button class="x" id="ovlClose">Close</button>
+      </div>
+      <div class="controls">
+        <label>Sort by:
+          <select id="sortSel">
+            <option value="title">Title (A→Z)</option>
+            <option value="author">Author (A→Z)</option>
+          </select>
+        </label>
+        <input id="filter" placeholder="Search…" />
+      </div>
+      <table id="tbl">
+        <thead><tr><th>Title</th><th>Author</th><th>Series</th><th>#</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 
+  <!-- Dot to open All Books -->
+  <div class="dot" id="dot" title="All books"></div>
+
 <script>
-  // Books — from your laptop list + one-sentence synopses
-  const BOOKS = [
-    {
-      title: "Diary of a Wimpy Kid",
-      author: "Jeff Kinney",
-      color: "c-rose",
-      tags: ["Middle school", "Humor"],
-      synopsis: "Greg Heffley chronicles the painfully funny chaos of middle school through doodles and deadpan snark."
-    },
-    {
-      title: "Harry Potter and the Sorcerer's Stone",
-      author: "J.K. Rowling",
-      color: "c-blue",
-      tags: ["Magic school", "Adventure"],
-      synopsis: "An orphan discovers he’s a wizard and enters a hidden world where his first year at Hogwarts unveils a dangerous secret."
-    },
-    {
-      title: "The Lightning Thief",
-      author: "Rick Riordan",
-      color: "c-purple",
-      tags: ["Greek gods", "Quest"],
-      synopsis: "Percy Jackson learns he’s Poseidon’s son and races across America to stop a divine war among the Olympians."
-    },
-    {
-      title: "Wings of Fire: The Dragonet Prophecy",
-      author: "Tui T. Sutherland",
-      color: "c-green",
-      tags: ["Dragons", "Destiny"],
-      synopsis: "Five young dragonets foretold to end a brutal war must decide whether to follow the prophecy—or forge their own path."
-    },
-    {
-      title: "Jurassic Park",
-      author: "Michael Crichton",
-      color: "c-amber",
-      tags: ["Sci‑fi", "Thriller"],
-      synopsis: "A theme park of cloned dinosaurs descends into terror when systems fail and nature proves impossible to control."
-    },
-    {
-      title: "Big Nate",
-      author: "Lincoln Peirce",
-      color: "c-teal",
-      tags: ["Comics", "School"],
-      synopsis: "A wisecracking sixth grader turns everyday disasters into laugh-out-loud adventures with friends, teachers, and trouble."
-    }
-  ];
-
-  // DOM shortcuts
-  const shelf = document.getElementById('shelf');
-  const q = document.getElementById('q');
-  const sortSel = document.getElementById('sort');
-  const shuffleBtn = document.getElementById('shuffle');
-  const countEl = document.getElementById('count');
-  const card = document.getElementById('card');
-  const cTitle = document.getElementById('c-title');
-  const cAuthor = document.getElementById('c-author');
-  const cSyn = document.getElementById('c-syn');
-  const cTags = document.getElementById('c-tags');
-  const closeBtn = document.getElementById('close');
-
-  let state = { books:[...BOOKS], q:"", sort:"title" };
-
-  function render(){
-    const qlc = state.q.trim().toLowerCase();
-    let list = [...state.books]
-      .filter(b => !qlc || b.title.toLowerCase().includes(qlc) || b.author.toLowerCase().includes(qlc));
-
-    list.sort((a,b)=>{
-      const key = state.sort;
-      return String(a[key]).localeCompare(String(b[key]));
-    });
-
-    shelf.querySelectorAll('.book').forEach(n=>n.remove());
-
-    list.forEach((b,i)=>{
-      const el = document.createElement('div');
-      el.className = `book ${b.color}`;
-      el.title = `${b.title} — ${b.author}`;
-      el.dataset.idx = BOOKS.indexOf(b);
-      const span = document.createElement('span');
-      span.textContent = b.title;
-      el.appendChild(span);
-      shelf.appendChild(el);
-    });
-
-    // Book of the Day ribbon
-    shelf.querySelectorAll('.ribbon').forEach(n=>n.remove());
-    const pick = Math.floor((Date.now()/86400000) % list.length);
-    const chosen = shelf.querySelectorAll('.book')[pick];
-    if(chosen){
-      const rb = document.createElement('div');
-      rb.className = 'ribbon';
-      rb.textContent = 'Book of the Day';
-      chosen.appendChild(rb);
-    }
-
-    countEl.textContent = `${list.length} book${list.length!==1?'s':''}`;
+/* ===== Data =====
+   You can edit the series mapping or add more titles later.
+   Each series includes: series title, author, series synopsis, and a list of books (title + number).
+*/
+const SERIES = [
+  {
+    id: "hp",
+    row: 0,
+    series: "Harry Potter",
+    author: "J.K. Rowling",
+    synopsis: "A boy wizard and his friends come of age at Hogwarts while facing the dark rise of Lord Voldemort.",
+    books: [
+      {title:"Harry Potter and the Sorcerer's Stone", no:1},
+      {title:"Harry Potter and the Chamber of Secrets", no:2},
+      {title:"Harry Potter and the Prisoner of Azkaban", no:3},
+      {title:"Harry Potter and the Goblet of Fire", no:4},
+      {title:"Harry Potter and the Order of the Phoenix", no:5},
+      {title:"Harry Potter and the Half-Blood Prince", no:6},
+      {title:"Harry Potter and the Deathly Hallows", no:7}
+    ]
+  },
+  {
+    id: "pjo",
+    row: 1,
+    series: "Percy Jackson & the Olympians",
+    author: "Rick Riordan",
+    synopsis: "A modern demigod learns he’s Poseidon's son and undertakes mythic quests to prevent wars among the gods.",
+    books: [
+      {title:"The Lightning Thief", no:1},
+      {title:"The Sea of Monsters", no:2},
+      {title:"The Titan's Curse", no:3},
+      {title:"The Battle of the Labyrinth", no:4},
+      {title:"The Last Olympian", no:5}
+    ]
+  },
+  {
+    id: "wof",
+    row: 2,
+    series: "Wings of Fire (Arc 1)",
+    author: "Tui T. Sutherland",
+    synopsis: "Five dragonets foretold to end a continent‑spanning war must choose between prophecy and forging their own destiny.",
+    books: [
+      {title:"The Dragonet Prophecy", no:1},
+      {title:"The Lost Heir", no:2},
+      {title:"The Hidden Kingdom", no:3},
+      {title:"The Dark Secret", no:4},
+      {title:"The Brightest Night", no:5}
+    ]
+  },
+  {
+    id: "wimpy",
+    row: 3,
+    series: "Diary of a Wimpy Kid",
+    author: "Jeff Kinney",
+    synopsis: "Greg Heffley’s illustrated journals capture the hilarious everyday disasters of middle school life.",
+    books: [
+      {title:"Diary of a Wimpy Kid", no:1},
+      {title:"Rodrick Rules", no:2},
+      {title:"The Last Straw", no:3},
+      {title:"Dog Days", no:4},
+      {title:"The Ugly Truth", no:5}
+    ]
+  },
+  /* Optional extras (included in All Books table) */
+  {
+    id: "bignite",
+    row: null, /* not mapped to a shelf row */
+    series: "Big Nate",
+    author: "Lincoln Peirce",
+    synopsis: "A wisecracking sixth‑grader turns everyday chaos into laugh‑out‑loud adventures.",
+    books: [
+      {title:"Big Nate: In a Class by Himself", no:1},
+      {title:"Big Nate Strikes Again", no:2},
+      {title:"Big Nate on a Roll", no:3}
+    ]
+  },
+  {
+    id: "jp",
+    row: null,
+    series: "Jurassic Park",
+    author: "Michael Crichton",
+    synopsis: "A biotech breakthrough resurrects dinosaurs, proving nature and hubris are a lethal mix.",
+    books: [
+      {title:"Jurassic Park", no:1},
+      {title:"The Lost World", no:2}
+    ]
   }
+];
 
-  function openCard(b){
-    cTitle.textContent = b.title;
-    cAuthor.textContent = `by ${b.author}`;
-    cSyn.textContent = b.synopsis;
-    cTags.innerHTML = '';
-    (b.tags||[]).forEach(t=>{
-      const tag = document.createElement('div');
-      tag.className = 'tag'; tag.textContent = t; cTags.appendChild(tag);
-    });
-    card.classList.add('open');
+/* ===== Build shelf hotspots ===== */
+const rows = [...document.querySelectorAll('.row')];
+rows.forEach((row,i)=>{
+  for(let c=0;c<16;c++){
+    const s=document.createElement('div');
+    s.className='spine';
+    // give subtle height variation to match drawn vibe
+    s.style.height = (68 + Math.floor(Math.random()*18)) + '%';
+    s.dataset.row=i;
+    row.appendChild(s);
   }
+});
 
-  shelf.addEventListener('click', (e)=>{
-    const el = e.target.closest('.book');
-    if(!el) return;
-    openCard(BOOKS[Number(el.dataset.idx)]);
+/* ===== Card logic ===== */
+const card = document.getElementById('card');
+const cTitle = document.getElementById('c-title');
+const cMeta = document.getElementById('c-meta');
+const cSyn = document.getElementById('c-syn');
+const btnAnother = document.getElementById('another');
+const btnClose = document.getElementById('close');
+
+let currentSeries = null;
+
+function randomFrom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+
+function openRandomForSeries(seriesId){
+  const S = SERIES.find(s=>s.id===seriesId);
+  if(!S) return;
+  currentSeries = S;
+  const pick = randomFrom(S.books);
+  cTitle.textContent = pick.title;
+  cMeta.textContent  = `by ${S.author} • #${pick.no} in ${S.series}`;
+  cSyn.textContent   = S.synopsis;
+  card.classList.add('open');
+}
+
+btnAnother.addEventListener('click', ()=>{ if(currentSeries) openRandomForSeries(currentSeries.id) });
+btnClose.addEventListener('click', ()=> card.classList.remove('open'));
+window.addEventListener('keydown', e=>{ if(e.key==='Escape') card.classList.remove('open') });
+
+/* Click on any spine resolves its row -> series */
+document.getElementById('frame').addEventListener('click', (e)=>{
+  const spine = e.target.closest('.spine');
+  if(!spine) return;
+  const rowIndex = Number(spine.dataset.row);
+  const seriesForRow = SERIES.find(s=>s.row===rowIndex);
+  if(seriesForRow){ openRandomForSeries(seriesForRow.id) }
+});
+
+/* ===== All Books modal ===== */
+const dot = document.getElementById('dot');
+const ovl = document.getElementById('ovl');
+const ovlClose = document.getElementById('ovlClose');
+const sortSel = document.getElementById('sortSel');
+const filter = document.getElementById('filter');
+const tbody = document.querySelector('#tbl tbody');
+
+function flattenBooks(){
+  const rows=[];
+  SERIES.forEach(S=>{
+    S.books.forEach(b=>{
+      rows.push({ title:b.title, author:S.author, series:S.series, no:b.no });
+    });
   });
+  return rows;
+}
+let TABLE = flattenBooks();
 
-  closeBtn.addEventListener('click', ()=> card.classList.remove('open'));
-  card.addEventListener('click', (e)=>{ if(e.target===card) card.classList.remove('open') });
-
-  q.addEventListener('input', ()=>{ state.q = q.value; render() });
-  sortSel.addEventListener('change', ()=>{ state.sort = sortSel.value; render() });
-  shuffleBtn.addEventListener('click', ()=>{
-    // Fisher–Yates
-    for(let i=state.books.length-1;i>0;i--){
-      const j=Math.floor(Math.random()*(i+1));
-      [state.books[i],state.books[j]]=[state.books[j],state.books[i]];
-    }
-    render();
+function renderTable(){
+  const q = filter.value.trim().toLowerCase();
+  let list = TABLE.filter(r =>
+    !q || r.title.toLowerCase().includes(q) || r.author.toLowerCase().includes(q) || r.series.toLowerCase().includes(q)
+  );
+  list.sort((a,b)=> String(a[sortSel.value]).localeCompare(String(b[sortSel.value])));
+  tbody.innerHTML='';
+  list.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML = `<td>${r.title}</td><td>${r.author}</td><td>${r.series}</td><td>${r.no}</td>`;
+    tbody.appendChild(tr);
   });
+}
 
-  // Keyboard: "/" to focus search, Esc to close card
-  window.addEventListener('keydown', (e)=>{
-    if(e.key === '/'){ e.preventDefault(); q.focus() }
-    if(e.key === 'Escape'){ card.classList.remove('open') }
-  });
+dot.addEventListener('click', ()=>{ ovl.classList.add('open'); renderTable() });
+ovlClose.addEventListener('click', ()=> ovl.classList.remove('open'));
+sortSel.addEventListener('change', renderTable);
+filter.addEventListener('input', renderTable);
 
-  render();
+/* Accessibility: click outside panel to close */
+ovl.addEventListener('click', e=>{
+  if(e.target===ovl) ovl.classList.remove('open');
+});
+
+/* ===== End ===== */
 </script>
 </body>
 </html>
