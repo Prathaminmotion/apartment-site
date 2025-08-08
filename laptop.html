@@ -168,7 +168,7 @@
       </div>
 
       <div class="hint">
-        <span class="kbd">TAB</span> autocomplete • <span class="kbd">↑/↓</span> history • <span class="kbd">/help</span> for commands
+        <span class="kbd">TAB</span> autocomplete • <span class="kbd">↑/↓</span> history • <span class="kbd">/help</span> for commands • <span class="kbd">/exit</span> to return
       </div>
     </div>
   </div>
@@ -183,7 +183,7 @@ const ABOUT_ME = "Hi, I am Pratham. I'm 22 years old and I'm currently studying 
 
 // Links (replace with real URLs)
 const LINKS = [
-  { label: "Saginaw Discount Pharmacy", url: "https:/saginawdiscountpharmacy.com" },
+  { label: "Saginaw Discount Pharmacy", url: "https://saginawdiscountpharmacy.com" },
   { label: "Euclid Pharmacy", url: "https://euclidpharmacy.com" },
   { label: "Brotherhood Pharmacy", url: "https://brotherhoodrx.com" },
   { label: "Autism Systems Foundation", url: "https://autismsystemsfoundation.com" }
@@ -276,6 +276,7 @@ const BOOKS = [
 // Commands registry (for /help and autocomplete)
 const COMMANDS = [
   { command: "/help", description: "Show available commands." },
+  { command: "/exit", description: "Return to the room (index.html)." },
   { command: "/clear", description: "Clear the terminal." },
   { command: "/about", description: "About Pratham." },
   { command: "/contact", description: "Email and phone." },
