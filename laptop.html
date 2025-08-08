@@ -578,8 +578,10 @@ const handlers = {
   "/time": () => cmd_time(),
   "/weather": args => cmd_weather(args),
   "/calc": args => cmd_calc(args),
-  "/hack": () => cmd_hack()
+  "/hack": () => cmd_hack(),
+  "/exit": () => { window.location.href = "index.html"; }
 };
+
 
 /* =========================
    Boot + Input Events
