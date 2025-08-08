@@ -2,25 +2,165 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Room for Growth</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <!-- ====== Critical Styles (Inline) ====== -->
+  <style>
+    /* Reset & Base */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{margin:0;padding:0;height:100%}
+    body{
+      background: var(--bg, #0f1114);
+      color: var(--text, #eaeef5);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height: 1.35;
+      transition: background .45s ease, color .45s ease;
+    }
+
+    /* Theme vars (shifted by day/night state) */
+    :root{
+      --bg:#0f1114;
+      --panel:#1a1d24;
+      --text:#eaeef5;
+      --muted:#a8b0bf;
+      --accent:#7dd3fc; /* soft neon blue */
+      --overlay-opa: 0;         /* lighting intensity */
+      --overlay-grad: radial-gradient(60% 60% at 75% 25%, rgba(255,210,130,.0) 0%, rgba(255,180,90,.0) 40%, rgba(0,0,0,.0) 60%);
+      --vignette-opa: 0;        /* vignette at night */
+    }
+
+    /* Time-of-day states */
+    [data-theme="dawn"]{
+      --bg:#0e1116;
+      --panel:#171b21;
+      --accent:#8be3ff;
+      --overlay-opa:.25;
+      --overlay-grad: linear-gradient(180deg, rgba(150,200,255,.12), rgba(255,200,140,.10));
+      --vignette-opa:.08;
+    }
+    [data-theme="day"]{
+      --bg:#0e1014;
+      --panel:#171b21;
+      --accent:#7dd3fc;
+      --overlay-opa:.12;
+      --overlay-grad: linear-gradient(180deg, rgba(140,200,255,.10), rgba(140,200,255,.06));
+      --vignette-opa:.05;
+    }
+    [data-theme="dusk"]{
+      --bg:#0e0f12;
+      --panel:#17181e;
+      --accent:#87c8ff;
+      --overlay-opa:.35;
+      --overlay-grad: radial-gradient(60% 60% at 80% 20%, rgba(255,170,120,.35), rgba(0,0,0,0) 60%);
+      --vignette-opa:.14;
+    }
+    [data-theme="night"]{
+      --bg:#0a0c10;
+      --panel:#14161a;
+      --accent:#6ec1ff;
+      --overlay-opa:.45;
+      --overlay-grad: linear-gradient(180deg, rgba(30,60,120,.28), rgba(10,20,40,.32));
+      --vignette-opa:.22;
+    }
+
+    /* Room container & image */
+    #room-container{position:relative; text-align:center; max-width:1600px; margin:0 auto;}
+    #room-image{max-width:100%; height:auto; display:block; margin:0 auto; user-select:none}
+
+    /* Lighting overlays: gradient + vignette; no pointer capture */
+    .lighting,
+    .vignette{
+      position:absolute; inset:0; pointer-events:none; z-index:1;
+      opacity:var(--overlay-opa);
+      transition: opacity .6s ease;
+    }
+    .lighting{ background: var(--overlay-grad); mix-blend-mode: soft-light; }
+    .vignette{
+      opacity:var(--vignette-opa);
+      background: radial-gradient(130% 130% at 50% 60%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%);
+      mix-blend-mode: multiply;
+    }
+
+    /* Dot base style */
+    .dot{
+      position:absolute; z-index:2;
+      width:16px; height:16px; border-radius:50%;
+      border:2px solid rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.22);
+      transform: translate(-50%, -50%);
+      cursor:pointer; transition: background .25s ease, transform .2s ease, box-shadow .2s ease;
+      outline: none;
+    }
+    .dot:hover,
+    .dot:focus-visible{
+      background: rgba(255,255,255,1);
+      transform: translate(-50%, -50%) scale(1.35);
+      box-shadow: 0 6px 16px rgba(0,0,0,.45), 0 0 18px rgba(125,211,252,.55);
+    }
+    /* Tooltip */
+    .dot::after{
+      content: attr(data-label);
+      position:absolute; bottom:135%; left:50%; transform:translateX(-50%);
+      background: rgba(0,0,0,0.75); color:#fff; padding:2px 6px; border-radius:4px;
+      font-size:12px; white-space:nowrap; opacity:0; transition:opacity .15s ease; pointer-events:none;
+    }
+    .dot:hover::after, .dot:focus-visible::after{ opacity:1; }
+
+    /* Modal overlay */
+    #content-modal{
+      position:fixed; inset:0; background:rgba(0,0,0,.78);
+      display:none; justify-content:center; align-items:center; z-index:1000;
+      animation: fadeInOverlay .3s ease-out;
+    }
+    /* Modal box */
+    #modal-box{
+      background: var(--panel);
+      color: var(--text);
+      padding: 1.25rem 1.25rem 1rem;
+      border-radius: 12px;
+      width: min(92vw, 640px);
+      position:relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,.55);
+      animation: slideIn .28s ease-out;
+    }
+    #close-btn{
+      position:absolute; top:.5rem; right:.6rem;
+      background:none; border:1px solid rgba(255,255,255,.12);
+      color:var(--text); font-size:1.25rem; line-height:1;
+      border-radius:8px; padding:.2rem .5rem; cursor:pointer;
+    }
+    #modal-content{ margin-top:.75rem; line-height:1.55; color:var(--text); }
+
+    /* Animations */
+    @keyframes fadeInOverlay{ from{opacity:0} to{opacity:1} }
+    @keyframes slideIn{ from{ transform: translateY(-14px); opacity:0 } to{ transform:none; opacity:1 } }
+
+    /* Accessibility: Respect reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{ transition:none !important; animation:none !important }
+    }
+  </style>
 </head>
-<body>
-  <main id="room-container">
-    <img id="room-image" src="room.png" alt="Interactive apartment room" />
+<body data-theme="day">
+  <main id="room-container" aria-label="Interactive apartment room">
+    <img id="room-image" src="room.png" alt="Interactive apartment room" draggable="false" />
+
+    <!-- Lighting layers -->
+    <div class="lighting" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
 
     <!-- Floating dots -->
-    <span class="dot dot-bed"        data-zone="bed"        data-label="Bed"></span>
-    <span class="dot dot-clothes"    data-zone="clothes"    data-label="Closet"></span>
-    <span class="dot dot-vault"      data-zone="vault"      data-label="Vault"></span>
-    <span class="dot dot-tv"         data-zone="tv"         data-label="TV"></span>
-    <span class="dot dot-art"        data-zone="art"        data-label="Artwork"></span>
-    <span class="dot dot-window"     data-zone="window"     data-label="Window"></span>
-    <span class="dot dot-laptop"     data-zone="laptop"     data-label="Laptop"></span>
-    <span class="dot dot-desk"       data-zone="desk"       data-label="Desk"></span>
-    <span class="dot dot-bookshelf"  data-zone="bookshelf"  data-label="Bookshelf"></span>
-    <span class="dot dot-mirror"     data-zone="mirror"     data-label="Mirror"></span>
+    <span class="dot dot-bed"        data-zone="bed"        data-label="Bed"        role="button" tabindex="0" aria-label="Open Bed"></span>
+    <span class="dot dot-clothes"    data-zone="clothes"    data-label="Closet"     role="button" tabindex="0" aria-label="Open Closet"></span>
+    <span class="dot dot-vault"      data-zone="vault"      data-label="Vault"      role="button" tabindex="0" aria-label="Open Vault"></span>
+    <span class="dot dot-tv"         data-zone="tv"         data-label="TV"         role="button" tabindex="0" aria-label="Open TV"></span>
+    <span class="dot dot-art"        data-zone="art"        data-label="Artwork"    role="button" tabindex="0" aria-label="Open Artwork"></span>
+    <span class="dot dot-window"     data-zone="window"     data-label="Window"     role="button" tabindex="0" aria-label="Open Window"></span>
+    <span class="dot dot-laptop"     data-zone="laptop"     data-label="Laptop"     role="button" tabindex="0" aria-label="Open Laptop"></span>
+    <span class="dot dot-desk"       data-zone="desk"       data-label="Desk"       role="button" tabindex="0" aria-label="Open Desk"></span>
+    <span class="dot dot-bookshelf"  data-zone="bookshelf"  data-label="Bookshelf"  role="button" tabindex="0" aria-label="Open Bookshelf"></span>
+    <span class="dot dot-mirror"     data-zone="mirror"     data-label="Mirror"     role="button" tabindex="0" aria-label="Open Mirror"></span>
   </main>
 
   <!-- Modal -->
@@ -31,6 +171,146 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- ====== Inline Script ====== -->
+  <script>
+    // ===== Content map (kept from your script) =====
+    const CONTENT = {
+      bed:        "🛏 Your personal bed zone. Swap in dream logs or comfort items.",
+      clothes:    "👕 Closet: favorite outfits or style moodboard.",
+      vault:      "🔐 Secret vault: hidden notes or unreleased ideas.",
+      tv:         "📺 TV: your watchlist and media recommendations.",
+      art:        "🖼 Artwork: inspiration gallery or moodboard.",
+      window:     "🌇 Window: your vision board or skyline dreams.",
+      desk:       "🗂 Desk: resume, portfolio links, project showcase.",
+      mirror:     "🪞 Mirror: About Me or poetic personal bio."
+    };
+
+    // ===== DOM refs =====
+    const container = document.getElementById('room-container');
+    const img = document.getElementById('room-image');
+    const dots = document.querySelectorAll('.dot');
+    const modal = document.getElementById('content-modal');
+    const contentEl = document.getElementById('modal-content');
+    const closeBtn = document.getElementById('close-btn');
+
+    // ===== Time-of-day lighting =====
+    function themeForHour(h){
+      if (h >= 5.5 && h < 7.5) return 'dawn';
+      if (h >= 7.5 && h < 17.5) return 'day';
+      if (h >= 17.5 && h < 20.5) return 'dusk';
+      return 'night';
+    }
+    function applyTheme(){
+      const now = new Date();
+      const hour = now.getHours() + now.getMinutes()/60;
+      document.body.setAttribute('data-theme', themeForHour(hour));
+    }
+    applyTheme();
+    // Re-evaluate roughly every 15 minutes
+    setInterval(applyTheme, 15*60*1000);
+
+    // ===== Responsive dot positioning =====
+    // These are your original pixel coordinates. We'll transform them to percentages
+    // based on the image's natural size, then keep them responsive on resize.
+    const ORIGINAL_POS = {
+      "dot-window":    { x:907,  y:248 },
+      "dot-laptop":    { x:854,  y:479 },
+      "dot-desk":      { x:877,  y:550 },
+      "dot-mirror":    { x:1268, y:317 },
+      "dot-bookshelf": { x:1188, y:527 },
+      "dot-bed":       { x:300,  y:853 },
+      "dot-clothes":   { x:260,  y:349 },
+      "dot-art":       { x:473,  y:195 },
+      "dot-tv":        { x:478,  y:409 },
+      "dot-vault":     { x:160,  y:651 }
+    };
+
+    let basis = { w: null, h: null };
+    function measureBasis(){
+      // Use image's natural dimensions when available; fallback to current size
+      const nw = img.naturalWidth || img.clientWidth;
+      const nh = img.naturalHeight || img.clientHeight;
+      basis = { w: nw, h: nh };
+    }
+    function placeDots(){
+      const rect = img.getBoundingClientRect();
+      const ratioX = rect.width / basis.w;
+      const ratioY = rect.height / basis.h;
+
+      dots.forEach(dot=>{
+        // Find key by class (dot-*)
+        const key = Array.from(dot.classList).find(c => c.startsWith('dot-'));
+        const pos = ORIGINAL_POS[key];
+        if(!pos) return;
+
+        const left = pos.x * ratioX + rect.left + window.scrollX;
+        const top  = pos.y * ratioY + rect.top  + window.scrollY;
+
+        // Position using absolute to the container (which wraps the image)
+        // Convert viewport coords back to container percentage to stay fluid
+        const cRect = container.getBoundingClientRect();
+        const pxLeft = left - cRect.left - window.scrollX;
+        const pxTop  = top  - cRect.top  - window.scrollY;
+
+        const pctLeft = (pxLeft / rect.width) * 100;
+        const pctTop  = (pxTop  / rect.height) * 100;
+
+        dot.style.left = pctLeft + '%';
+        dot.style.top  = pctTop  + '%';
+      });
+    }
+
+    // After image loads, compute and place
+    if (img.complete) {
+      measureBasis(); placeDots();
+    } else {
+      img.addEventListener('load', ()=>{ measureBasis(); placeDots(); });
+    }
+    window.addEventListener('resize', placeDots);
+
+    // ===== Interactions =====
+    function openZone(zone){
+      if (zone === 'laptop') {
+        window.location.href = 'laptop.html';
+        return;
+      }
+      if (zone === 'bookshelf') {
+        window.location.href = 'bookshelf.html';
+        return;
+      }
+      const text = CONTENT[zone] || `No content for "${zone}".`;
+      contentEl.textContent = text;
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden','false');
+      closeBtn.focus();
+    }
+
+    dots.forEach(dot=>{
+      dot.addEventListener('click', ()=> openZone(dot.getAttribute('data-zone')));
+      dot.addEventListener('keydown', (e)=>{
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openZone(dot.getAttribute('data-zone'));
+        }
+      });
+    });
+
+    function hideModal(){
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden','true');
+    }
+    closeBtn.addEventListener('click', hideModal);
+    modal.addEventListener('click', e => { if (e.target === modal) hideModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.style.display === 'flex') hideModal(); });
+
+    // Give Vault a minimal visible focus ring even though it's "invisible"
+    const vault = document.querySelector('.dot-vault');
+    if (vault){
+      vault.style.background = 'transparent';
+      vault.style.border = 'none';
+      vault.addEventListener('focus-visible', ()=>{ vault.style.outline = '2px dashed rgba(255,255,255,.5)'; vault.style.outlineOffset='2px'; });
+      vault.addEventListener('blur', ()=>{ vault.style.outline = 'none'; });
+    }
+  </script>
 </body>
 </html>
