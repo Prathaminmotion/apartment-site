@@ -107,7 +107,8 @@
     }
     #modal-box{
       background: var(--panel); color: var(--text);
-      padding: 1.25rem 1.25rem 1rem; border-radius: 12px; width: min(92vw, 640px);
+      padding: 1.25rem 1.25rem 1rem; border-radius: 12px;
+      width: min(96vw, 820px); /* widened for better list layout */
       position:relative; box-shadow: 0 10px 30px rgba(0,0,0,.55); animation: slideIn .28s ease-out;
     }
     #close-btn{
@@ -124,7 +125,8 @@
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; animation:none !important }
     }
-        /* --- Bookshelf modal bits --- */
+
+    /* --- Bookshelf modal bits --- */
     .book-cover{
       width:120px; aspect-ratio:2/3; border-radius:10px;
       background:
@@ -147,15 +149,27 @@
       padding:8px 12px; cursor:pointer;
     }
     .book-chip{ background:#e9c46a; color:#3b2f1e; border:none }
-    .table-wrap{ margin-top:10px; display:none }
-    .table-wrap.show{ display:block }
-    .table-wrap table{ width:100%; border-collapse:collapse; font-size:.95rem }
-    .table-wrap th, .table-wrap td{ padding:8px 10px; border-bottom:1px solid #1f2837 }
-    .table-wrap th{ text-align:left; color:#a9b6cf; position:sticky; top:0; background:#0f141e }
-    .table-controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:8px 0 }
-    .table-controls select, .table-controls input{
+
+    /* Grouped All Books list */
+    .list-wrap{ margin-top:12px; display:none; }
+    .list-wrap.show{ display:block; }
+
+    .list-controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:8px }
+    .list-controls select, .list-controls input{
       background:#0f141e; color:#dbe4f6; border:1px solid #243049; border-radius:10px; padding:8px 10px;
     }
+
+    .series-list{ max-height:56vh; overflow:auto; padding-right:6px }
+    .series-group{ margin:10px 0 14px; }
+    .series-title{
+      font-weight:700; color:#f2ead3; background:#1a1f28; border:1px solid #2a3344;
+      padding:6px 10px; border-radius:8px; position:sticky; top:0;
+    }
+    .book-item{
+      display:flex; justify-content:space-between; align-items:center;
+      padding:8px 10px; border-bottom:1px solid #1f2837; color:#eaeef5;
+    }
+    .book-item small{ color:#a9b6cf }
   </style>
 </head>
 <body data-theme="day">
@@ -188,7 +202,7 @@
   </div>
 
   <script>
-    // Content for each zone
+    // Content for each non-bookshelf zone
     const CONTENT = {
       bed:     "🛏 Your personal bed zone. Swap in dream logs or comfort items.",
       clothes: "👕 Closet: favorite outfits or style moodboard.",
@@ -223,7 +237,7 @@
     // Interactions
     function openZone(zone){
       if (zone === 'laptop') { window.location.href = 'laptop.html'; return; }
-      if (zone === 'bookshelf') { openBookshelfModal(); return; }
+      if (zone === 'bookshelf') { openBookshelfModal(); return; }  // <-- changed here
 
       const text = CONTENT[zone] || `No content for "${zone}".`;
       contentEl.textContent = text;
@@ -253,136 +267,158 @@
       vault.addEventListener('focus-visible', ()=>{ vault.style.outline = '2px dashed rgba(255,255,255,.5)'; vault.style.outlineOffset='2px'; });
       vault.addEventListener('blur', ()=>{ vault.style.outline = 'none'; });
     }
-  </script>
-  <script>
-/* ===== Books data ===== */
-const SERIES = [
-  {
-    id:"hp", series:"Harry Potter", author:"J.K. Rowling",
-    synopsis:"A boy wizard and his friends come of age at Hogwarts while confronting the return of Lord Voldemort.",
-    books:[
-      {title:"Harry Potter and the Sorcerer's Stone", no:1},
-      {title:"Harry Potter and the Chamber of Secrets", no:2},
-      {title:"Harry Potter and the Prisoner of Azkaban", no:3},
-      {title:"Harry Potter and the Goblet of Fire", no:4},
-      {title:"Harry Potter and the Order of the Phoenix", no:5},
-      {title:"Harry Potter and the Half-Blood Prince", no:6},
-      {title:"Harry Potter and the Deathly Hallows", no:7},
-    ]
-  },
-  {
-    id:"pjo", series:"Percy Jackson & the Olympians", author:"Rick Riordan",
-    synopsis:"A modern demigod discovers his heritage and embarks on mythic quests to keep the gods from war.",
-    books:[
-      {title:"The Lightning Thief", no:1},
-      {title:"The Sea of Monsters", no:2},
-      {title:"The Titan's Curse", no:3},
-      {title:"The Battle of the Labyrinth", no:4},
-      {title:"The Last Olympian", no:5},
-    ]
-  },
-  {
-    id:"wof", series:"Wings of Fire (Arc 1)", author:"Tui T. Sutherland",
-    synopsis:"Five dragonets foretold to end a brutal war must decide whether to follow prophecy or forge their own path.",
-    books:[
-      {title:"The Dragonet Prophecy", no:1},
-      {title:"The Lost Heir", no:2},
-      {title:"The Hidden Kingdom", no:3},
-      {title:"The Dark Secret", no:4},
-      {title:"The Brightest Night", no:5},
-    ]
-  },
-  {
-    id:"wimpy", series:"Diary of a Wimpy Kid", author:"Jeff Kinney",
-    synopsis:"Greg Heffley’s illustrated journals turn middle‑school mishaps into deadpan comedy.",
-    books:[
-      {title:"Diary of a Wimpy Kid", no:1},
-      {title:"Rodrick Rules", no:2},
-      {title:"The Last Straw", no:3},
-      {title:"Dog Days", no:4},
-      {title:"The Ugly Truth", no:5},
-    ]
-  }
-];
-// optional extras (only show in All Books)
-const EXTRAS = [
-  {series:"Big Nate", author:"Lincoln Peirce", synopsis:"A wisecracking sixth‑grader turns everyday chaos into laugh‑out‑loud adventures.",
-   books:[{title:"Big Nate: In a Class by Himself",no:1},{title:"Big Nate Strikes Again",no:2},{title:"Big Nate on a Roll",no:3}]},
-  {series:"Jurassic Park", author:"Michael Crichton", synopsis:"A biotech breakthrough resurrects dinosaurs, proving nature and hubris are a lethal mix.",
-   books:[{title:"Jurassic Park",no:1},{title:"The Lost World",no:2}]}
-];
 
-const ALL_SERIES = [...SERIES, ...EXTRAS];
-const FLAT = ALL_SERIES.flatMap(S => S.books.map(b => ({...b, author:S.author, series:S.series})));
+    /* ===== BOOKSHELF MODAL DATA & LOGIC ===== */
 
-/* ===== Modal rendering ===== */
-function rnd(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+    // Core series (mapped to shelf vibe)
+    const SERIES = [
+      {
+        id:"hp", series:"Harry Potter", author:"J.K. Rowling",
+        synopsis:"A boy wizard and his friends come of age at Hogwarts while confronting the return of Lord Voldemort.",
+        books:[
+          {title:"Harry Potter and the Sorcerer's Stone", no:1},
+          {title:"Harry Potter and the Chamber of Secrets", no:2},
+          {title:"Harry Potter and the Prisoner of Azkaban", no:3},
+          {title:"Harry Potter and the Goblet of Fire", no:4},
+          {title:"Harry Potter and the Order of the Phoenix", no:5},
+          {title:"Harry Potter and the Half-Blood Prince", no:6},
+          {title:"Harry Potter and the Deathly Hallows", no:7},
+        ]
+      },
+      {
+        id:"pjo", series:"Percy Jackson & the Olympians", author:"Rick Riordan",
+        synopsis:"A modern demigod discovers his heritage and embarks on mythic quests to keep the gods from war.",
+        books:[
+          {title:"The Lightning Thief", no:1},
+          {title:"The Sea of Monsters", no:2},
+          {title:"The Titan's Curse", no:3},
+          {title:"The Battle of the Labyrinth", no:4},
+          {title:"The Last Olympian", no:5},
+        ]
+      },
+      {
+        id:"wof", series:"Wings of Fire (Arc 1)", author:"Tui T. Sutherland",
+        synopsis:"Five dragonets foretold to end a brutal war must decide whether to follow prophecy or forge their own path.",
+        books:[
+          {title:"The Dragonet Prophecy", no:1},
+          {title:"The Lost Heir", no:2},
+          {title:"The Hidden Kingdom", no:3},
+          {title:"The Dark Secret", no:4},
+          {title:"The Brightest Night", no:5},
+        ]
+      },
+      {
+        id:"wimpy", series:"Diary of a Wimpy Kid", author:"Jeff Kinney",
+        synopsis:"Greg Heffley’s illustrated journals turn middle‑school mishaps into deadpan comedy.",
+        books:[
+          {title:"Diary of a Wimpy Kid", no:1},
+          {title:"Rodrick Rules", no:2},
+          {title:"The Last Straw", no:3},
+          {title:"Dog Days", no:4},
+          {title:"The Ugly Truth", no:5},
+        ]
+      }
+    ];
 
-function openBookshelfModal(seriesId=null){
-  const S = seriesId ? ALL_SERIES.find(s=>s.id===seriesId) : rnd(SERIES); // default pick from the 4 shelf series
-  const pick = rnd(S.books);
-  // build HTML for the modal content
-  contentEl.innerHTML = `
-    <div class="book-head">
-      <div class="book-cover" id="book-cover"></div>
-      <div>
-        <div class="book-title">${pick.title}</div>
-        <div class="book-sub">by ${S.author} • #${pick.no} in ${S.series}</div>
-        <p class="book-syn">${S.synopsis}</p>
-        <div class="book-row">
-          <button class="book-btn" id="btn-another">🎲 Another random</button>
-          <button class="book-chip" id="btn-all">All books</button>
-        </div>
-        <div class="table-wrap" id="books-table">
-          <div class="table-controls">
-            <label>Sort:
-              <select id="tbl-sort">
-                <option value="title">Title (A→Z)</option>
-                <option value="author">Author (A→Z)</option>
-              </select>
-            </label>
-            <input id="tbl-filter" placeholder="Search…">
-            <button class="book-btn" id="btn-back">Back</button>
+    // Optional extras (show up in “All books” only)
+    const EXTRAS = [
+      {series:"Big Nate", author:"Lincoln Peirce", synopsis:"A wisecracking sixth‑grader turns everyday chaos into laugh‑out‑loud adventures.",
+       books:[{title:"Big Nate: In a Class by Himself",no:1},{title:"Big Nate Strikes Again",no:2},{title:"Big Nate on a Roll",no:3}]},
+      {series:"Jurassic Park", author:"Michael Crichton", synopsis:"A biotech breakthrough resurrects dinosaurs, proving nature and hubris are a lethal mix.",
+       books:[{title:"Jurassic Park",no:1},{title:"The Lost World",no:2}]}
+    ];
+
+    const ALL_SERIES = [...SERIES, ...EXTRAS];
+    const rnd = arr => arr[Math.floor(Math.random()*arr.length)];
+
+    function openBookshelfModal(seriesId=null){
+      const S = seriesId ? ALL_SERIES.find(s=>s.id===seriesId) : rnd(ALL_SERIES);
+      const pick = rnd(S.books);
+
+      contentEl.innerHTML = `
+        <div class="book-head">
+          <div class="book-cover" id="book-cover"></div>
+          <div>
+            <div class="book-title">${pick.title}</div>
+            <div class="book-sub">by ${S.author} • #${pick.no} in ${S.series}</div>
+            <p class="book-syn">${S.synopsis}</p>
+            <div class="book-row">
+              <button class="book-btn" id="btn-another" title="Click: any series • Shift+Click: same series">🎲 Another random</button>
+              <button class="book-chip" id="btn-all">All books</button>
+            </div>
+
+            <div class="list-wrap" id="books-list">
+              <div class="list-controls">
+                <label>Sort:
+                  <select id="lst-sort">
+                    <option value="title">Title (A→Z)</option>
+                    <option value="author">Author (A→Z)</option>
+                  </select>
+                </label>
+                <input id="lst-filter" placeholder="Search…">
+                <button class="book-btn" id="btn-back">Back</button>
+              </div>
+              <div class="series-list" id="series-list"></div>
+            </div>
           </div>
-          <table>
-            <thead><tr><th>Title</th><th>Author</th><th>Series</th><th>#</th></tr></thead>
-            <tbody id="tbl-body"></tbody>
-          </table>
         </div>
-      </div>
-    </div>
-  `;
-  // show modal
-  modal.style.display = 'flex';
-  modal.setAttribute('aria-hidden','false');
-  // set random hue on cover
-  const cover = document.getElementById('book-cover');
-  cover.style.filter = `hue-rotate(${Math.floor(Math.random()*360)}deg)`;
+      `;
 
-  // wire buttons
-  document.getElementById('btn-another').onclick = ()=> openBookshelfModal(S.id);
-  document.getElementById('btn-all').onclick = ()=>{
-    const wrap = document.getElementById('books-table');
-    wrap.classList.add('show'); renderTable();
-  };
-  document.getElementById('btn-back').onclick = ()=>{
-    document.getElementById('books-table').classList.remove('show');
-  };
+      // show modal
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden','false');
 
-  function renderTable(){
-    const sortSel = document.getElementById('tbl-sort');
-    const filterEl = document.getElementById('tbl-filter');
-    const tbody = document.getElementById('tbl-body');
+      // fun: randomize cover hue
+      const cover = document.getElementById('book-cover');
+      cover.style.filter = `hue-rotate(${Math.floor(Math.random()*360)}deg)`;
 
-    function draw(){
-      const q = (filterEl.value||'').toLowerCase();
-      let list = FLAT.filter(r => !q || r.title.toLowerCase().includes(q) || r.author.toLowerCase().includes(q) || r.series.toLowerCase().includes(q));
-      list.sort((a,b)=> String(a[sortSel.value]).localeCompare(String(b[sortSel.value])));
-      tbody.innerHTML = list.map(r=>`<tr><td>${r.title}</td><td>${r.author}</td><td>${r.series}</td><td>${r.no}</td></tr>`).join('');
+      // buttons
+      const btnAnother = document.getElementById('btn-another');
+      btnAnother.addEventListener('click', (e)=>{
+        if(e.shiftKey){ openBookshelfModal(S.id); }     // stay in same series
+        else{ openBookshelfModal(null); }               // any series
+      });
+
+      const listWrap = document.getElementById('books-list');
+      document.getElementById('btn-all').onclick = ()=>{ listWrap.classList.add('show'); renderSections() };
+      document.getElementById('btn-back').onclick = ()=> listWrap.classList.remove('show');
+
+      function renderSections(){
+        const sortSel = document.getElementById('lst-sort');
+        const filterEl = document.getElementById('lst-filter');
+        const host = document.getElementById('series-list');
+
+        function draw(){
+          const q = (filterEl.value||'').toLowerCase();
+          host.innerHTML = '';
+
+          const key = sortSel.value; // 'title' or 'author'
+          ALL_SERIES.forEach(series=>{
+            const items = series.books
+              .map(b => ({...b, series: series.series, author: series.author}))
+              .filter(r => !q || r.title.toLowerCase().includes(q) || r.author.toLowerCase().includes(q) || r.series.toLowerCase().includes(q))
+              .sort((a,b)=> String(a[key]).localeCompare(String(b[key])));
+
+            if(!items.length) return;
+
+            const group = document.createElement('div');
+            group.className = 'series-group';
+            group.innerHTML = `<div class="series-title">${series.series} <small>by ${series.author}</small></div>`;
+            items.forEach(r=>{
+              const row = document.createElement('div');
+              row.className = 'book-item';
+              row.innerHTML = `<span>${r.title}</span><small>#${r.no} — ${r.author}</small>`;
+              group.appendChild(row);
+            });
+            host.appendChild(group);
+          });
+        }
+
+        sortSel.onchange = draw;
+        filterEl.oninput = draw;
+        draw();
+      }
     }
-    sortSel.onchange = draw; filterEl.oninput = draw; draw();
-  }
-}
-</script>
+  </script>
 </body>
 </html>
