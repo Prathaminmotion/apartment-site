@@ -99,7 +99,7 @@
       cursor: pointer;
     }
 
-    /* Modal */
+    /* Base Modal (reused by zones, bookshelf, TV) */
     #content-modal{
       position:fixed; inset:0; background:rgba(0,0,0,.78);
       display:none; justify-content:center; align-items:center; z-index:1000;
@@ -108,7 +108,7 @@
     #modal-box{
       background: var(--panel); color: var(--text);
       padding: 1.25rem 1.25rem 1rem; border-radius: 12px;
-      width: min(96vw, 820px); /* widened for better list layout */
+      width: min(96vw, 880px);
       position:relative; box-shadow: 0 10px 30px rgba(0,0,0,.55); animation: slideIn .28s ease-out;
     }
     #close-btn{
@@ -121,7 +121,6 @@
     @keyframes fadeInOverlay{ from{opacity:0} to{opacity:1} }
     @keyframes slideIn{ from{ transform: translateY(-14px); opacity:0 } to{ transform:none; opacity:1 } }
 
-    /* Accessibility: reduced motion */
     @media (prefers-reduced-motion: reduce){
       *{ transition:none !important; animation:none !important }
     }
@@ -150,15 +149,12 @@
     }
     .book-chip{ background:#e9c46a; color:#3b2f1e; border:none }
 
-    /* Grouped All Books list */
     .list-wrap{ margin-top:12px; display:none; }
     .list-wrap.show{ display:block; }
-
     .list-controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:8px }
     .list-controls select, .list-controls input{
       background:#0f141e; color:#dbe4f6; border:1px solid #243049; border-radius:10px; padding:8px 10px;
     }
-
     .series-list{ max-height:56vh; overflow:auto; padding-right:6px }
     .series-group{ margin:10px 0 14px; }
     .series-title{
@@ -170,6 +166,136 @@
       padding:8px 10px; border-bottom:1px solid #1f2837; color:#eaeef5;
     }
     .book-item small{ color:#a9b6cf }
+
+    /* --- Retro TV modal UI --- */
+    .tv-wrap{
+      position:relative;
+      background:#0b0c10;
+      border-radius:14px;
+      padding:16px 16px 16px 16px;
+    }
+    /* CRT frame */
+    .tv{
+      position:relative;
+      border-radius:18px;
+      background: #2b241c;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.08), 0 18px 40px rgba(0,0,0,.45);
+      padding:18px 18px 18px 18px;
+      display:grid;
+      grid-template-columns: 1fr 140px; /* screen + knobs area */
+      gap:14px;
+    }
+    .tv-frame{
+      border-radius:16px;
+      background: linear-gradient(180deg, #0d1016, #0a0d12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 -10px 18px rgba(0,0,0,.5);
+      padding:10px;
+      position:relative;
+      overflow:hidden;
+    }
+    .tv-screen{
+      border-radius:10px;
+      background:#0a0c10;
+      min-height:280px;
+      position:relative;
+      overflow:hidden;
+      box-shadow: inset 0 0 60px rgba(0,0,0,.6);
+    }
+    /* scanline / glow */
+    .tv-screen:before{
+      content:"";
+      position:absolute; inset:0;
+      background: repeating-linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.02) 2px, transparent 2px, transparent 4px);
+      pointer-events:none;
+      mix-blend-mode:soft-light;
+    }
+    .tv-screen:after{
+      content:"";
+      position:absolute; inset:-30% -30%;
+      background: radial-gradient(70% 60% at 50% 50%, rgba(120,180,255,.08), transparent 60%);
+      pointer-events:none;
+      mix-blend-mode:screen;
+    }
+    /* static effect */
+    .tv-static{
+      position:absolute; inset:0; pointer-events:none;
+      background:
+        repeating-conic-gradient(from 0deg, rgba(255,255,255,.06) 0 4deg, rgba(0,0,0,.06) 4deg 8deg),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 3px, rgba(0,0,0,.03) 3px 6px);
+      opacity:0; transition:opacity .15s ease;
+    }
+    .tv-static.show{ opacity:1; animation: fuzz .45s steps(14) forwards }
+    @keyframes fuzz{
+      0%{ transform:scale(1.02) }
+      100%{ transform:scale(1) }
+    }
+
+    .screen-inner{
+      position:absolute; inset:0; padding:16px; overflow:auto;
+    }
+    .ch-label{
+      position:absolute; right:10px; top:10px;
+      background: rgba(0,0,0,.45); color:#eaeef5; border:1px solid rgba(255,255,255,.15);
+      padding:4px 8px; border-radius:999px; font-size:12px;
+    }
+    .tv-title{ font-weight:700; margin:0 0 6px; }
+    .tv-sub{ color:#cfd9f0; margin:0 0 10px; font-size:.95rem }
+    .tv-card{
+      display:flex; gap:14px; align-items:flex-start;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      padding:12px; border-radius:10px;
+    }
+    .tv-cover{
+      width:100px; aspect-ratio:2/3; border-radius:8px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.18), rgba(0,0,0,.25)),
+        linear-gradient(180deg,#5f6fb7,#37406d);
+      box-shadow:0 10px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.28);
+      flex:0 0 auto;
+    }
+    .tv-text{ color:#eaeef5 }
+    .tv-syn{ color:#e7dec7 }
+    .tv-actions{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap }
+    .btn{ background:#0f141e; color:#dce6ff; border:1px solid #243049; border-radius:10px; padding:8px 12px; cursor:pointer; }
+    .btn:active{ transform:translateY(1px) }
+
+    /* knobs column */
+    .knobs{
+      display:flex; flex-direction:column; gap:10px;
+      background: linear-gradient(180deg, #1b1f27, #12151b);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px; padding:12px;
+    }
+    .knob{
+      background: linear-gradient(180deg, #2a2f3a, #1a1f28);
+      color:#d9e6ff; border:1px solid #313c52;
+      border-radius:10px; padding:10px 12px; cursor:pointer; text-align:left;
+    }
+    .knob.active{
+      outline:2px solid #7aa2ff; outline-offset:2px;
+    }
+    .subtabs{ display:flex; gap:8px; margin:8px 0 2px; flex-wrap:wrap }
+    .subtab{
+      background:#232a39; border:1px solid #32405a; color:#dce6ff;
+      border-radius:999px; padding:6px 10px; cursor:pointer; font-size:.88rem;
+    }
+    .subtab.active{ background:#e9c46a; color:#2f2618; border-color:#e9c46a }
+
+    /* guide (view all) inside screen */
+    .guide{ margin-top:10px; display:none }
+    .guide.show{ display:block }
+    .guide-grid{
+      display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:10px;
+    }
+    .guide-item{
+      background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+      padding:10px; border-radius:10px;
+    }
+    .guide-item .title{ font-weight:700; margin-bottom:4px }
+    .guide-item .meta{ color:#cfd9f0; font-size:.9rem; margin-bottom:4px }
+    .guide-item .desc{ color:#e7dec7; font-size:.92rem }
+
   </style>
 </head>
 <body data-theme="day">
@@ -202,16 +328,16 @@
   </div>
 
   <script>
-    // Content for each non-bookshelf zone
+    /* ---------- NON-BOOKSHELF BASE CONTENT ---------- */
     const CONTENT = {
       bed:     "🛏 Your personal bed zone. Swap in dream logs or comfort items.",
       clothes: "👕 Closet: favorite outfits or style moodboard.",
       vault:   "🔐 Secret vault: hidden notes or unreleased ideas.",
-      tv:      "📺 TV: your watchlist and media recommendations.",
-      art:     "🖼 Artwork: inspiration gallery or moodboard.",
-      window:  "🌇 Window: your vision board or skyline dreams.",
-      desk:    "🗂 Desk: resume, portfolio links, project showcase.",
-      mirror:  "🪞 Mirror: About Me or poetic personal bio."
+      tv:      "", // handled via openTvModal()
+      art:     "🖼 Inspiration wall or moodboard.",
+      window:  "🌇 Daily view or travel inspiration.",
+      desk:    "🗂 Project hub: portfolio tiles and progress.",
+      mirror:  "🪞 Reflection prompts or a short bio."
     };
 
     const dots = document.querySelectorAll('.dot');
@@ -219,7 +345,6 @@
     const contentEl = document.getElementById('modal-content');
     const closeBtn = document.getElementById('close-btn');
 
-    // Day/Night theme
     function themeForHour(h){
       if (h >= 5.5 && h < 7.5) return 'dawn';
       if (h >= 7.5 && h < 17.5) return 'day';
@@ -234,10 +359,10 @@
     applyTheme();
     setInterval(applyTheme, 15*60*1000);
 
-    // Interactions
     function openZone(zone){
       if (zone === 'laptop') { window.location.href = 'laptop.html'; return; }
-      if (zone === 'bookshelf') { openBookshelfModal(); return; }  // <-- changed here
+      if (zone === 'bookshelf') { openBookshelfModal(); return; }
+      if (zone === 'tv') { openTvModal(); return; }
 
       const text = CONTENT[zone] || `No content for "${zone}".`;
       contentEl.textContent = text;
@@ -261,16 +386,13 @@
     modal.addEventListener('click', e => { if (e.target === modal) hideModal(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.style.display === 'flex') hideModal(); });
 
-    // Vault: add minimal focus ring even though it's invisible
     const vault = document.querySelector('.dot-vault');
     if (vault){
       vault.addEventListener('focus-visible', ()=>{ vault.style.outline = '2px dashed rgba(255,255,255,.5)'; vault.style.outlineOffset='2px'; });
       vault.addEventListener('blur', ()=>{ vault.style.outline = 'none'; });
     }
 
-    /* ===== BOOKSHELF MODAL DATA & LOGIC ===== */
-
-    // Core series (mapped to shelf vibe)
+    /* ---------- BOOKSHELF MODAL (existing happy version) ---------- */
     const SERIES = [
       {
         id:"hp", series:"Harry Potter", author:"J.K. Rowling",
@@ -319,15 +441,12 @@
         ]
       }
     ];
-
-    // Optional extras (show up in “All books” only)
     const EXTRAS = [
       {series:"Big Nate", author:"Lincoln Peirce", synopsis:"A wisecracking sixth‑grader turns everyday chaos into laugh‑out‑loud adventures.",
        books:[{title:"Big Nate: In a Class by Himself",no:1},{title:"Big Nate Strikes Again",no:2},{title:"Big Nate on a Roll",no:3}]},
       {series:"Jurassic Park", author:"Michael Crichton", synopsis:"A biotech breakthrough resurrects dinosaurs, proving nature and hubris are a lethal mix.",
        books:[{title:"Jurassic Park",no:1},{title:"The Lost World",no:2}]}
     ];
-
     const ALL_SERIES = [...SERIES, ...EXTRAS];
     const rnd = arr => arr[Math.floor(Math.random()*arr.length)];
 
@@ -364,19 +483,14 @@
         </div>
       `;
 
-      // show modal
       modal.style.display = 'flex';
       modal.setAttribute('aria-hidden','false');
 
-      // fun: randomize cover hue
       const cover = document.getElementById('book-cover');
       cover.style.filter = `hue-rotate(${Math.floor(Math.random()*360)}deg)`;
 
-      // buttons
-      const btnAnother = document.getElementById('btn-another');
-      btnAnother.addEventListener('click', (e)=>{
-        if(e.shiftKey){ openBookshelfModal(S.id); }     // stay in same series
-        else{ openBookshelfModal(null); }               // any series
+      document.getElementById('btn-another').addEventListener('click', (e)=>{
+        if(e.shiftKey){ openBookshelfModal(S.id); } else { openBookshelfModal(null); }
       });
 
       const listWrap = document.getElementById('books-list');
@@ -391,16 +505,13 @@
         function draw(){
           const q = (filterEl.value||'').toLowerCase();
           host.innerHTML = '';
-
-          const key = sortSel.value; // 'title' or 'author'
-          ALL_SERIES.forEach(series=>{
+          const key = sortSel.value;
+          [...ALL_SERIES].forEach(series=>{
             const items = series.books
               .map(b => ({...b, series: series.series, author: series.author}))
               .filter(r => !q || r.title.toLowerCase().includes(q) || r.author.toLowerCase().includes(q) || r.series.toLowerCase().includes(q))
               .sort((a,b)=> String(a[key]).localeCompare(String(b[key])));
-
             if(!items.length) return;
-
             const group = document.createElement('div');
             group.className = 'series-group';
             group.innerHTML = `<div class="series-title">${series.series} <small>by ${series.author}</small></div>`;
@@ -413,11 +524,256 @@
             host.appendChild(group);
           });
         }
-
-        sortSel.onchange = draw;
-        filterEl.oninput = draw;
+        document.getElementById('lst-sort').onchange = draw;
+        document.getElementById('lst-filter').oninput = draw;
         draw();
       }
+    }
+
+    /* ---------- TV MODAL: RETRO CHANNEL SURFING ---------- */
+
+    // DATA from your lists
+    const TV_DATA = {
+      movies: {
+        subTabs: [
+          {
+            id:'alltime', name:'All‑Time Top 10', items: [
+              {title:'Interstellar', desc:'A father ventures through space and time to save humanity’s future.'},
+              {title:'Inception', desc:'A skilled thief enters dreams to plant an idea deep in a target’s mind.'},
+              {title:'Madagascar', desc:'Zoo animals escape to the wild and discover life beyond their cage.'},
+              {title:'Iron Man (2008)', desc:'A billionaire builds a suit of armor to fight his own weapons.'},
+              {title:'Knives Out', desc:'A witty detective unravels a twisted family murder mystery.'},
+              {title:'Avengers', desc:'Earth’s mightiest heroes unite to stop an alien invasion.'},
+              {title:'Tower Heist', desc:'Employees plot revenge on the mogul who swindled them.'},
+              {title:'Se7en', desc:'Detectives hunt a killer who follows the seven deadly sins.'},
+              {title:'Sinners', desc:'A gritty crime tale about choices and consequences.'},
+              {title:'The Dark Knight', desc:'Batman faces a moral trial against the Joker’s chaos.'},
+            ]
+          },
+          {
+            id:'indian', name:'Indian Top 5', items: [
+              {title:'Housefull 3', desc:'Three men try to prove they deserve love and family approval.'},
+              {title:'3 Idiots', desc:'Friendship and purpose collide in a college coming‑of‑age.'},
+              {title:'Krrish', desc:'A man discovers his superhuman legacy—and a destiny to protect.'},
+              {title:'Hera Pheri', desc:'A get‑rich‑quick scheme spirals into hilarious chaos.'},
+              {title:'Aankhen', desc:'A daring bank heist executed by an unlikely team.'},
+            ]
+          }
+        ]
+      },
+      shows: {
+        items: [
+          {title:'Brooklyn Nine‑Nine', desc:'A quirky precinct solves crimes and cracks jokes.'},
+          {title:'Game of Thrones', desc:'Noble houses clash for the Iron Throne.'},
+          {title:'Breaking Bad', desc:'A chemistry teacher enters the criminal underworld.'},
+          {title:'Modern Family', desc:'A loving, chaotic family navigates life together.'},
+          {title:'How I Met Your Mother', desc:'A winding tale of love, friendship, and fate.'},
+        ]
+      },
+      cartoons: {
+        items: [
+          {title:'Fullmetal Alchemist', desc:'Brothers use alchemy to fix what was lost.'},
+          {title:'Invincible', desc:'A young hero confronts shocking truths.'},
+          {title:'Attack on Titan', desc:'Humanity fights giants behind towering walls.'},
+          {title:'Naruto', desc:'A boy ninja dreams of becoming Hokage.'},
+          {title:'Super Hero Squad Show', desc:'Marvel heroes team up for lighthearted fun.'},
+        ]
+      },
+      youtube: {
+        items: [
+          {title:'Poet Plays', desc:'Story‑driven gaming with community vibes.'},
+          {title:'MrBeast', desc:'Over‑the‑top challenges and philanthropy.'},
+          {title:'Ryan Higa', desc:'Classic sketches and creative shorts.'},
+          {title:'Syntac', desc:'Chill survival/building gameplay and guides.'},
+          {title:'The King of Random', desc:'DIY science and curiosity projects.'},
+        ]
+      },
+      music: {
+        items: [
+          {title:'Drake', desc:'Rap/R&B crossover hits and melodies.'},
+          {title:'21 Savage', desc:'Gritty storytelling and icy delivery.'},
+          {title:'Ye', desc:'Boundary‑pushing production and vision.'},
+          {title:'Young Thug', desc:'Elastic flows and avant‑rap style.'},
+          {title:'Gunna', desc:'Smooth, melodic trap anthems.'},
+        ]
+      }
+    };
+
+    const CHANNELS = [
+      {id:'movies',  name:'Movies',   number:1},
+      {id:'shows',   name:'TV Shows', number:2},
+      {id:'cartoons',name:'Cartoons', number:3},
+      {id:'youtube', name:'YouTube',  number:4},
+      {id:'music',   name:'Music',    number:5},
+    ];
+
+    function openTvModal(){
+      // Build TV structure inside the existing modal
+      contentEl.innerHTML = `
+        <div class="tv-wrap">
+          <div class="tv">
+            <div class="tv-frame">
+              <div class="tv-screen">
+                <div class="tv-static" id="tv-static"></div>
+                <div class="screen-inner">
+                  <div class="ch-label" id="tv-ch">CH 1</div>
+                  <h3 class="tv-title" id="tv-title">Movies</h3>
+                  <p class="tv-sub" id="tv-sub">Flip channels or pick a sub‑channel.</p>
+                  <div class="subtabs" id="tv-subtabs"></div>
+                  <div class="tv-card">
+                    <div class="tv-cover" id="tv-cover"></div>
+                    <div class="tv-text">
+                      <div class="tv-item-title" id="tv-item-title" style="font-weight:700; margin-bottom:6px;">—</div>
+                      <div class="tv-syn" id="tv-item-desc">—</div>
+                      <div class="tv-actions">
+                        <button class="btn" id="tv-random">🎲 Random</button>
+                        <button class="btn" id="tv-viewall">📋 View All</button>
+                        <button class="btn" id="tv-power">⏻ Off</button>
+                      </div>
+                      <div class="guide" id="tv-guide">
+                        <div class="tv-actions" style="margin:8px 0 6px">
+                          <button class="btn" id="tv-guide-back">⬅ Back</button>
+                        </div>
+                        <div class="guide-grid" id="tv-guide-grid"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div> <!-- /screen-inner -->
+              </div> <!-- /tv-screen -->
+            </div> <!-- /tv-frame -->
+
+            <div class="knobs" id="tv-knobs"></div>
+          </div>
+        </div>
+      `;
+
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden','false');
+
+      const staticEl = document.getElementById('tv-static');
+      const chLbl = document.getElementById('tv-ch');
+      const titleEl = document.getElementById('tv-title');
+      const subEl = document.getElementById('tv-sub');
+      const subtabsEl = document.getElementById('tv-subtabs');
+      const itemTitle = document.getElementById('tv-item-title');
+      const itemDesc = document.getElementById('tv-item-desc');
+      const cover = document.getElementById('tv-cover');
+      const guide = document.getElementById('tv-guide');
+      const guideGrid = document.getElementById('tv-guide-grid');
+
+      // build knobs
+      const knobs = document.getElementById('tv-knobs');
+      CHANNELS.forEach((c,i)=>{
+        const b = document.createElement('button');
+        b.className = 'knob';
+        b.textContent = `CH ${c.number} — ${c.name}`;
+        b.dataset.ch = c.id;
+        knobs.appendChild(b);
+      });
+
+      let currentChannel = 'movies';
+      let currentSub = TV_DATA.movies.subTabs[0].id; // default to first movie subtab
+
+      function showStatic(){ staticEl.classList.remove('show'); void staticEl.offsetWidth; staticEl.classList.add('show'); }
+      function randomizeCover(){ cover.style.filter = `hue-rotate(${Math.floor(Math.random()*360)}deg)`; }
+
+      function setActiveKnob(){
+        [...knobs.children].forEach(k => k.classList.toggle('active', k.dataset.ch === currentChannel));
+      }
+
+      function renderSubtabs(){
+        subtabsEl.innerHTML = '';
+        if(currentChannel !== 'movies'){ return; }
+        TV_DATA.movies.subTabs.forEach(st=>{
+          const b = document.createElement('button');
+          b.className = 'subtab' + (st.id===currentSub ? ' active':'');
+          b.textContent = st.name;
+          b.dataset.sub = st.id;
+          b.onclick = ()=>{
+            currentSub = st.id;
+            flip(() => renderContent());
+          };
+          subtabsEl.appendChild(b);
+        });
+      }
+
+      function getCurrentList(){
+        if(currentChannel === 'movies'){
+          const found = TV_DATA.movies.subTabs.find(s => s.id===currentSub) || TV_DATA.movies.subTabs[0];
+          return found.items;
+        }
+        return TV_DATA[currentChannel].items;
+      }
+
+      function renderContent(){
+        setActiveKnob();
+        renderSubtabs();
+
+        const chInfo = CHANNELS.find(c=>c.id===currentChannel);
+        chLbl.textContent = `CH ${chInfo.number}`;
+        titleEl.textContent = chInfo.name;
+
+        if(currentChannel === 'movies'){
+          const st = TV_DATA.movies.subTabs.find(s => s.id===currentSub);
+          subEl.textContent = st ? st.name : '';
+        } else {
+          subEl.textContent = '';
+        }
+
+        const list = getCurrentList();
+        const pick = list[Math.floor(Math.random()*list.length)];
+        itemTitle.textContent = pick.title;
+        itemDesc.textContent = pick.desc;
+        randomizeCover();
+        guide.classList.remove('show');
+      }
+
+      function flip(cb){
+        showStatic();
+        setTimeout(()=>{ cb && cb(); }, 260); // after static, render
+      }
+
+      // initial render
+      renderContent();
+
+      // knob events
+      [...knobs.children].forEach(k=>{
+        k.onclick = ()=>{
+          const next = k.dataset.ch;
+          if(next === currentChannel) return;
+          currentChannel = next;
+          // when entering movies, ensure a subtab exists
+          if(currentChannel === 'movies' && !currentSub){
+            currentSub = TV_DATA.movies.subTabs[0].id;
+          }
+          flip(() => renderContent());
+        };
+      });
+
+      // actions
+      document.getElementById('tv-random').onclick = ()=>{
+        flip(() => {
+          const list = getCurrentList();
+          const pick = list[Math.floor(Math.random()*list.length)];
+          itemTitle.textContent = pick.title;
+          itemDesc.textContent = pick.desc;
+          randomizeCover();
+        });
+      };
+
+      document.getElementById('tv-viewall').onclick = ()=>{
+        guide.classList.add('show');
+        const list = getCurrentList();
+        guideGrid.innerHTML = list.map(x => `
+          <div class="guide-item">
+            <div class="title">${x.title}</div>
+            <div class="desc">${x.desc}</div>
+          </div>
+        `).join('');
+      };
+      document.getElementById('tv-guide-back').onclick = ()=> guide.classList.remove('show');
+
+      document.getElementById('tv-power').onclick = hideModal;
     }
   </script>
 </body>
