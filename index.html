@@ -35,12 +35,12 @@
       /* TV positioning knobs (percentages tuned to tv.png) */
       --tv-screen-left: 12.4%;
       --tv-screen-top: 31.9%;
-      --tv-screen-width: 74.2%;
-      --tv-screen-height: 43.7%;
+      --tv-screen-width: 55.8%;
+      --tv-screen-height: 43.0%;
 
-      /* On-screen UI tuning */
-      --tv-ui-scale: 0.90;      /* lower = smaller (0.88–0.95 is a good range) */
-      --tv-safe-bottom: 10px;   /* extra breathing room below the card */
+      /* On-screen UI scaling + bottom breathing room */
+      --tv-ui-scale: 0.86;      /* lower = smaller UI */
+      --tv-safe-bottom: 12px;   /* extra space under content */
     }
     [data-theme="dawn"]{
       --bg:#0e1116; --panel:#171b21; --accent:#8be3ff;
@@ -77,7 +77,7 @@
     .dot::after{ content: attr(data-label); position:absolute; bottom:135%; left:50%; transform:translateX(-50%); background: rgba(0,0,0,0.75); color:#fff; padding:2px 6px; border-radius:4px; font-size:12px; white-space:nowrap; opacity:0; transition:opacity .15s ease; pointer-events:none; }
     .dot:hover::after,.dot:focus-visible::after{opacity:1}
 
-    /* Dot positions (center of each item, responsive %) for 1536x1024 base */
+    /* Dot positions for 1536x1024 base */
     .dot-laptop    { left: 59.52%;  top: 45.41%; }
     .dot-window    { left: 61.70%;  top: 24.69%; }
     .dot-mirror    { left: 86.39%;  top: 32.24%; }
@@ -90,13 +90,13 @@
     .dot-vault { left: 10.42%; top: 63.57%; width: 16px; height: 16px; background: transparent !important; border: none !important; cursor: pointer; }
 
     /* ==========================
-       Base Modal (reused by zones, bookshelf, TV)
+       Base Modal
     ========================== */
     #content-modal{ position:fixed; inset:0; background:rgba(0,0,0,.78); display:none; justify-content:center; align-items:center; z-index:1000; animation: fadeInOverlay .3s ease-out; }
     #modal-box{
       background: var(--panel); color: var(--text);
       padding: 1.25rem 1.25rem 1rem; border-radius: 12px;
-      width: min(96vw, 1200px);
+      width: min(96vw, 1120px);
       position:relative; box-shadow: 0 10px 30px rgba(0,0,0,.55); animation: slideIn .28s ease-out;
     }
     #close-btn{ position:absolute; top:.5rem; right:.6rem; background:none; border:1px solid rgba(255,255,255,.12); color:var(--text); font-size:1.25rem; line-height:1; border-radius:8px; padding:.2rem .5rem; cursor:pointer; }
@@ -104,7 +104,6 @@
 
     @keyframes fadeInOverlay{ from{opacity:0} to{opacity:1} }
     @keyframes slideIn{ from{ transform: translateY(-14px); opacity:0 } to{ transform:none; opacity:1 } }
-
     @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important } }
 
     /* ==========================
@@ -134,9 +133,9 @@
        Uses tv.png. Content is placed in .tv-screen.
     ========================== */
     .tv-wrap{ display:grid; grid-template-columns: 1fr 300px; gap:18px; align-items:stretch; }
-
     .tv-shell{ position:relative; width:min(90vw, 820px); aspect-ratio:1/1; background:url('tv.png') center/contain no-repeat; border-radius:20px; filter: drop-shadow(0 14px 34px rgba(0,0,0,.5)); }
 
+    /* On-screen region aligned to the white CRT area of tv.png */
     .tv-screen{
       position:absolute;
       left:var(--tv-screen-left);
@@ -149,12 +148,19 @@
       box-shadow:
         inset 0 0 90px rgba(0,0,0,.75),
         inset 0 0 6px rgba(120,180,255,.25);
+      font-size: clamp(10px, 1.1vw, 14px);
     }
 
     /* Glass & scanline effects */
-    .tv-glass:before{ content:""; position:absolute; inset:0; background: radial-gradient(90% 70% at 50% 35%, rgba(255,255,255,.08), transparent 60%), repeating-linear-gradient(180deg, rgba(255,255,255,.04) 0 2px, rgba(0,0,0,.04) 2px 4px); mix-blend-mode:soft-light; pointer-events:none; }
+    .tv-glass:before{
+      content:""; position:absolute; inset:0;
+      background:
+        radial-gradient(90% 70% at 50% 35%, rgba(255,255,255,.08), transparent 60%),
+        repeating-linear-gradient(180deg, rgba(255,255,255,.04) 0 2px, rgba(0,0,0,.04) 2px 4px);
+      mix-blend-mode:soft-light; pointer-events:none;
+    }
 
-    /* Screen layout */
+    /* Screen layout + scaling */
     .screen-inner{
       position:absolute; inset:0; padding:12px;
       display:grid; grid-template-rows:auto auto 1fr; gap:10px; color:#eaeef5;
@@ -164,15 +170,12 @@
       transform-origin: top left;
       padding-bottom: calc(12px + var(--tv-safe-bottom));
     }
-
-    /* little room between tabs and card */
-    .remote-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
-
     .screen-head{ position:relative; display:flex; align-items:center; gap:10px; }
     .ch-badge{ margin-left:auto; background: rgba(0,0,0,.55); color:#eaeef5; border:1px solid rgba(255,255,255,.15); font-size:12px; padding:4px 8px; border-radius:999px; }
     .tv-h1{ font-weight:800; font-size:1rem; margin:0; }
     .tv-sub{ color:#cfd9f0; margin:0; font-size:.9rem; }
 
+    .remote-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
     .pill{ background:#232a39; border:1px solid #32405a; color:#dce6ff; border-radius:999px; padding:6px 10px; cursor:pointer; font-size:.85rem; }
     .pill.active{ background:#e9c46a; color:#2f2618; border-color:#e9c46a }
 
@@ -200,7 +203,7 @@
     .btn{ background:#0f141e; color:#dce6ff; border:1px solid #243049; border-radius:10px; padding:6px 10px; cursor:pointer; }
     .btn:active{ transform:translateY(1px) }
 
-    /* Guide fills screen-body and scrolls; card hidden while guide shown */
+    /* Guide fills screen-body and scrolls; card hides when guide visible */
     .guide{ position:absolute; inset:0; display:none; }
     .guide.show{ display:block; }
     .grid{ position:absolute; inset:44px 0 0 0; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:10px; padding-right:4px; }
@@ -550,8 +553,9 @@
       {id:'music',   name:'Music',    number:5},
     ];
 
-    // Load saved TV screen calibration if present
-    const SAVED_BOX = JSON.parse(localStorage.getItem('tvBBox')||'null');
+    // Use a versioned key so old calibrations don't override these new defaults
+    const BOX_KEY = 'tvBBox_v2';
+    const SAVED_BOX = JSON.parse(localStorage.getItem(BOX_KEY) || 'null');
     if (SAVED_BOX) {
       const r = document.documentElement.style;
       r.setProperty('--tv-screen-left', SAVED_BOX.left + '%');
@@ -628,7 +632,7 @@
                 <button class="remote-key" data-num="3">3</button>
                 <button class="remote-key" data-num="4">4</button>
                 <button class="remote-key" data-num="5">5</button>
-                <button class="remote-key" data-num="0">RND</button>
+                <button class="remote-key" data-num="0">0</button>
               </div>
             </div>
           </aside>
@@ -637,6 +641,7 @@
 
       // Hide the X while TV is open (Power closes the modal)
       closeBtn.style.display = 'none';
+
       modal.style.display = 'flex';
       modal.setAttribute('aria-hidden','false');
 
@@ -707,56 +712,45 @@
       }
       function renderContent(){
         setActiveKnob(); renderSubtabs(); setLabels(); drawItem();
-        guide.classList.remove('show'); card.style.display = '';
+        guide.classList.remove('show'); card.style.display='';
       }
 
       // Initial render
       renderContent();
 
-      // Top arrow buttons cycle items
+      // Remote arrows: cycle items
       document.getElementById('prev-item').onclick = ()=>{ currentIndex--; flip(drawItem); };
       document.getElementById('next-item').onclick = ()=>{ currentIndex++; flip(drawItem); };
 
       // CH buttons change channel; reset to #1 each time
       knobs.querySelectorAll('.knob').forEach(k=>{
         k.onclick = ()=>{
-          const next = k.dataset.ch;
-          if(next === currentChannel) return;
-          currentChannel = next;
-          currentIndex = 0;
-          if(currentChannel === 'movies' && !currentSub){
-            currentSub = TV_DATA.movies.subTabs[0].id;
-          }
+          const next = k.dataset.ch; if(next === currentChannel) return;
+          currentChannel = next; currentIndex = 0;
+          if(currentChannel === 'movies' && !currentSub) currentSub = TV_DATA.movies.subTabs[0].id;
           flip(()=>{ renderContent(); saveState(); });
         };
       });
 
-      // Numeric quick-select 1–5  + 0 = random media across all channels
+      // Random media helper for "0" key/button
+      function goRandomMedia(){
+        const randCh = CHANNELS[Math.floor(Math.random()*CHANNELS.length)];
+        currentChannel = randCh.id;
+        if(currentChannel === 'movies'){
+          const tabs = TV_DATA.movies.subTabs;
+          currentSub = tabs[Math.floor(Math.random()*tabs.length)].id;
+        }
+        const list = listForCurrent();
+        currentIndex = Math.floor(Math.random()*list.length);
+        flip(()=>{ renderContent(); saveState(); });
+      }
+
+      // Numeric quick-select 1–5, and 0 = Random media
       knobs.querySelectorAll('.remote-key').forEach(k=>{
         k.onclick = ()=>{
           const n = k.dataset.num;
-
-          if (n === '0') {
-            // Random channel
-            const ids = CHANNELS.map(c=>c.id);
-            currentChannel = ids[Math.floor(Math.random()*ids.length)];
-            // Random sub if Movies
-            if (currentChannel === 'movies') {
-              const subs = TV_DATA.movies.subTabs;
-              currentSub = subs[Math.floor(Math.random()*subs.length)].id;
-            } else {
-              currentSub = null;
-            }
-            // Random item in that list
-            const list = (currentChannel === 'movies'
-              ? TV_DATA.movies.subTabs.find(s=>s.id===currentSub).items
-              : TV_DATA[currentChannel].items);
-            currentIndex = Math.floor(Math.random()*list.length);
-            flip(()=>{ renderContent(); saveState(); });
-            return;
-          }
-
-          if (n>0 && n<=5){
+          if(n === '0'){ goRandomMedia(); return; }
+          if(n>0 && n<=5){
             const id = CHANNELS[n-1].id;
             knobs.querySelector(`.knob[data-ch="${id}"]`).click();
           }
@@ -780,10 +774,12 @@
       document.getElementById('btn-guide-back').onclick = ()=>{
         guide.classList.remove('show'); card.style.display='';
       };
+
+      // Power off
       document.getElementById('btn-power').onclick = hideModal;
       document.getElementById('power-remote').onclick = hideModal;
 
-      // Keyboard: Left/Right items, digits for channels
+      // Keyboard: Left/Right items, digits for channels, 0 = random
       function onKey(e){
         if(modal.style.display !== 'flex') return;
         if(e.key === 'ArrowLeft'){ document.getElementById('prev-item').click(); }
@@ -791,13 +787,13 @@
         else if(e.key >= '1' && e.key <= '5'){
           const id = CHANNELS[Number(e.key)-1].id;
           knobs.querySelector(`.knob[data-ch="${id}"]`).click();
-        } else if (e.key === '0') {
-          knobs.querySelector('.remote-key[data-num="0"]').click();
+        } else if (e.key === '0'){
+          goRandomMedia();
         }
       }
       document.addEventListener('keydown', onKey);
 
-      /* Calibration: Alt/Option-click CH badge; arrows move, Shift width, Alt height, S save, C copy CSS */
+      /* Calibration: Alt/Option-click CH badge; arrows move, Shift width, Alt height, S save (to v2 key), C copy CSS */
       const calib = document.getElementById('calib');
       const label = document.getElementById('calib-label');
       let calibOn = false;
@@ -814,9 +810,12 @@
         if(e.shiftKey){ if(e.key==='ArrowLeft') v.width-=step; if(e.key==='ArrowRight') v.width+=step; }
         if(e.altKey && !e.shiftKey){ if(e.key==='ArrowUp') v.height-=step; if(e.key==='ArrowDown') v.height+=step; }
         if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){ e.preventDefault(); writeVars(v); }
-        if(e.key.toLowerCase()==='s'){ localStorage.setItem('tvBBox', JSON.stringify(v)); updateLabel(v); }
+        if(e.key.toLowerCase()==='s'){ localStorage.setItem(BOX_KEY, JSON.stringify(v)); updateLabel(v); }
         if(e.key.toLowerCase()==='c'){
-          const css = `--tv-screen-left: ${v.left}%;\n--tv-screen-top: ${v.top}%;\n--tv-screen-width: ${v.width}%;\n--tv-screen-height: ${v.height}%;`;
+          const css = `--tv-screen-left: ${v.left}%;
+--tv-screen-top: ${v.top}%;
+--tv-screen-width: ${v.width}%;
+--tv-screen-height: ${v.height}%;`;
           navigator.clipboard?.writeText(css); updateLabel(v);
         }
         if(e.key==='Escape'){ calibOn = false; calib.style.display = 'none'; }
