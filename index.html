@@ -31,16 +31,16 @@
       --overlay-opa: 0;         /* lighting intensity */
       --overlay-grad: radial-gradient(60% 60% at 75% 25%, rgba(255,210,130,.0) 0%, rgba(255,180,90,.0) 40%, rgba(0,0,0,.0) 60%);
       --vignette-opa: 0;        /* vignette at night */
-      
+
       /* TV positioning knobs (percentages tuned to tv.png) */
       --tv-screen-left: 12.4%;
       --tv-screen-top: 31.9%;
       --tv-screen-width: 74.2%;
       --tv-screen-height: 43.7%;
-      
-      /* On-screen UI scaling + extra bottom room if needed */
-      --tv-ui-scale: 0.90;        /* 0.85–1.00; lower = smaller */
-      --tv-safe-bottom: 8px;      /* extra breathing room under the card */
+
+      /* On-screen UI tuning */
+      --tv-ui-scale: 0.90;      /* lower = smaller (0.88–0.95 is a good range) */
+      --tv-safe-bottom: 10px;   /* extra breathing room below the card */
     }
     [data-theme="dawn"]{
       --bg:#0e1116; --panel:#171b21; --accent:#8be3ff;
@@ -151,7 +151,6 @@
         inset 0 0 6px rgba(120,180,255,.25);
     }
 
-
     /* Glass & scanline effects */
     .tv-glass:before{ content:""; position:absolute; inset:0; background: radial-gradient(90% 70% at 50% 35%, rgba(255,255,255,.08), transparent 60%), repeating-linear-gradient(180deg, rgba(255,255,255,.04) 0 2px, rgba(0,0,0,.04) 2px 4px); mix-blend-mode:soft-light; pointer-events:none; }
 
@@ -159,14 +158,14 @@
     .screen-inner{
       position:absolute; inset:0; padding:12px;
       display:grid; grid-template-rows:auto auto 1fr; gap:10px; color:#eaeef5;
-    
+
       /* uniformly shrink everything on the screen */
       transform: scale(var(--tv-ui-scale));
       transform-origin: top left;
       padding-bottom: calc(12px + var(--tv-safe-bottom));
     }
-    
-    /* add a little room between the tabs and the card */
+
+    /* little room between tabs and card */
     .remote-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
 
     .screen-head{ position:relative; display:flex; align-items:center; gap:10px; }
@@ -174,7 +173,6 @@
     .tv-h1{ font-weight:800; font-size:1rem; margin:0; }
     .tv-sub{ color:#cfd9f0; margin:0; font-size:.9rem; }
 
-    .remote-row{ display:flex; gap:8px; flex-wrap:wrap; }
     .pill{ background:#232a39; border:1px solid #32405a; color:#dce6ff; border-radius:999px; padding:6px 10px; cursor:pointer; font-size:.85rem; }
     .pill.active{ background:#e9c46a; color:#2f2618; border-color:#e9c46a }
 
@@ -198,12 +196,11 @@
     .title{ font-weight:700; margin-bottom:4px; font-size:.95rem; }
     .desc{ color:#e7dec7; font-size:.9rem; line-height:1.35; }
 
-
     .actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px }
     .btn{ background:#0f141e; color:#dce6ff; border:1px solid #243049; border-radius:10px; padding:6px 10px; cursor:pointer; }
     .btn:active{ transform:translateY(1px) }
 
-    /* Guide fills screen-body and scrolls; card is hidden when guide is visible */
+    /* Guide fills screen-body and scrolls; card hidden while guide shown */
     .guide{ position:absolute; inset:0; display:none; }
     .guide.show{ display:block; }
     .grid{ position:absolute; inset:44px 0 0 0; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:10px; padding-right:4px; }
@@ -631,7 +628,7 @@
                 <button class="remote-key" data-num="3">3</button>
                 <button class="remote-key" data-num="4">4</button>
                 <button class="remote-key" data-num="5">5</button>
-                <button class="remote-key" data-num="0">0</button>
+                <button class="remote-key" data-num="0">RND</button>
               </div>
             </div>
           </aside>
@@ -640,7 +637,6 @@
 
       // Hide the X while TV is open (Power closes the modal)
       closeBtn.style.display = 'none';
-
       modal.style.display = 'flex';
       modal.setAttribute('aria-hidden','false');
 
@@ -717,25 +713,50 @@
       // Initial render
       renderContent();
 
-      // Remote arrows: cycle items
+      // Top arrow buttons cycle items
       document.getElementById('prev-item').onclick = ()=>{ currentIndex--; flip(drawItem); };
       document.getElementById('next-item').onclick = ()=>{ currentIndex++; flip(drawItem); };
 
       // CH buttons change channel; reset to #1 each time
       knobs.querySelectorAll('.knob').forEach(k=>{
         k.onclick = ()=>{
-          const next = k.dataset.ch; if(next === currentChannel) return;
-          currentChannel = next; currentIndex = 0;
-          if(currentChannel === 'movies' && !currentSub) currentSub = TV_DATA.movies.subTabs[0].id;
+          const next = k.dataset.ch;
+          if(next === currentChannel) return;
+          currentChannel = next;
+          currentIndex = 0;
+          if(currentChannel === 'movies' && !currentSub){
+            currentSub = TV_DATA.movies.subTabs[0].id;
+          }
           flip(()=>{ renderContent(); saveState(); });
         };
       });
 
-      // Numeric quick-select 1–5
+      // Numeric quick-select 1–5  + 0 = random media across all channels
       knobs.querySelectorAll('.remote-key').forEach(k=>{
         k.onclick = ()=>{
           const n = k.dataset.num;
-          if(n>0 && n<=5){
+
+          if (n === '0') {
+            // Random channel
+            const ids = CHANNELS.map(c=>c.id);
+            currentChannel = ids[Math.floor(Math.random()*ids.length)];
+            // Random sub if Movies
+            if (currentChannel === 'movies') {
+              const subs = TV_DATA.movies.subTabs;
+              currentSub = subs[Math.floor(Math.random()*subs.length)].id;
+            } else {
+              currentSub = null;
+            }
+            // Random item in that list
+            const list = (currentChannel === 'movies'
+              ? TV_DATA.movies.subTabs.find(s=>s.id===currentSub).items
+              : TV_DATA[currentChannel].items);
+            currentIndex = Math.floor(Math.random()*list.length);
+            flip(()=>{ renderContent(); saveState(); });
+            return;
+          }
+
+          if (n>0 && n<=5){
             const id = CHANNELS[n-1].id;
             knobs.querySelector(`.knob[data-ch="${id}"]`).click();
           }
@@ -770,6 +791,8 @@
         else if(e.key >= '1' && e.key <= '5'){
           const id = CHANNELS[Number(e.key)-1].id;
           knobs.querySelector(`.knob[data-ch="${id}"]`).click();
+        } else if (e.key === '0') {
+          knobs.querySelector('.remote-key[data-num="0"]').click();
         }
       }
       document.addEventListener('keydown', onKey);
