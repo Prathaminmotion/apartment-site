@@ -33,10 +33,10 @@
       --vignette-opa: 0;        /* vignette at night */
 
       /* TV positioning knobs (percentages tuned to tv.png) */
-      --tv-screen-left: 11.5%;
-      --tv-screen-top: 13.8%;
-      --tv-screen-width: 58.2%;
-      --tv-screen-height: 56.5%;
+      --tv-screen-left: 12.4%;
+      --tv-screen-top: 15.4%;
+      --tv-screen-width: 55.8%;
+      --tv-screen-height: 54.6%;
     }
     [data-theme="dawn"]{
       --bg:#0e1116; --panel:#171b21; --accent:#8be3ff;
@@ -124,7 +124,7 @@
        Retro TV — image-driven shell with layered screen
        Uses tv.png (square image). Content is placed in .tv-screen.
     ========================== */
-    .tv-wrap{ display:grid; grid-template-columns: 1fr 240px; gap:16px; align-items:stretch; }
+    .tv-wrap{ display:grid; grid-template-columns: 1fr 280px; gap:18px; align-items:stretch; }
 
     .tv-shell{ position:relative; width:min(90vw, 820px); aspect-ratio:1/1; background:url('tv.png') center/contain no-repeat; border-radius:20px; filter: drop-shadow(0 14px 34px rgba(0,0,0,.5)); }
 
@@ -174,14 +174,14 @@
     @keyframes wipeDown{ 0%{opacity:1; transform:translateY(-100%)} 100%{opacity:0; transform:translateY(100%)} }
 
     /* Remote look & feel */
-    .controls{ align-self:stretch; display:flex; flex-direction:column; gap:12px; background: linear-gradient(180deg, #171c26, #0f1218); border:1px solid rgba(255,255,255,.08); border-radius:28px; padding:14px; box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 8px 20px rgba(0,0,0,.4); }
-    .remote-top{ display:flex; justify-content:space-between; align-items:center; }
-    .btn-round{ width:38px; height:38px; border-radius:999px; border:1px solid #32405a; background:#232a39; color:#dce6ff; cursor:pointer; }
-    .remote-section{ background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:10px; }
-    .knob{ background: linear-gradient(180deg, #2a2f3a, #1a1f28); color:#d9e6ff; border:1px solid #313c52; border-radius:12px; padding:10px 12px; text-align:left; cursor:pointer; width:100%; }
+    .controls{ align-self:stretch; width:280px; display:flex; flex-direction:column; gap:14px; background: linear-gradient(180deg, #161a22, #0e1117); border:1px solid rgba(255,255,255,.08); border-radius:28px; padding:16px; box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 10px 24px rgba(0,0,0,.42); }
+    .remote-top{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
+    .btn-round{ width:44px; height:44px; border-radius:999px; border:1px solid #32405a; background:#232a39; color:#dce6ff; cursor:pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 2px 8px rgba(0,0,0,.35);} .btn-round:active{ transform:translateY(1px);} 
+    .remote-section{ background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:10px; }
+    .knob{ background: linear-gradient(180deg, #2a2f3a, #1a1f28); color:#d9e6ff; border:1px solid #313c52; border-radius:14px; padding:10px 12px; text-align:left; cursor:pointer; width:100%; } .knob + .knob{ margin-top:8px;} .knob.active{ outline:2px solid var(--accent); outline-offset:2px }
     .knob.active{ outline:2px solid var(--accent); outline-offset:2px }
-    .remote-nav{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; }
-    .remote-key{ background:#232a39; border:1px solid #32405a; color:#dce6ff; border-radius:12px; padding:8px 0; text-align:center; cursor:pointer; }
+    .remote-nav{ display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; }
+    .remote-key{ background:#232a39; border:1px solid #32405a; color:#dce6ff; border-radius:12px; padding:10px 0; text-align:center; cursor:pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,.06);} .remote-key:active{ transform:translateY(1px);} 
 
     /* Mobile: stack TV over controls */
     @media (max-width: 900px){ .tv-wrap{ grid-template-columns: 1fr; } .controls{ order:2 } .tv-shell{ order:1; width:min(96vw, 680px); } } .controls{ order:2 } .tv-shell{ order:1; width:min(96vw, 680px); } }
@@ -439,14 +439,25 @@
       {id:'music',   name:'Music',    number:5},
     ];
 
+    // Persisted TV screen calibration
+    const SAVED_BOX = JSON.parse(localStorage.getItem('tvBBox')||'null');
+    if(SAVED_BOX){
+      const r = document.documentElement.style;
+      r.setProperty('--tv-screen-left', SAVED_BOX.left + '%');
+      r.setProperty('--tv-screen-top', SAVED_BOX.top + '%');
+      r.setProperty('--tv-screen-width', SAVED_BOX.width + '%');
+      r.setProperty('--tv-screen-height', SAVED_BOX.height + '%');
+    }
+
     function openTvModal(){
       const last = JSON.parse(localStorage.getItem('tvState')||'{}');
       let currentChannel = last.channel || 'movies';
       let currentSub = last.sub || (TV_DATA.movies.subTabs?.[0]?.id);
+      let currentIndex = 0; // always start at #1
 
       contentEl.innerHTML = `
         <div class="tv-wrap">
-          <div class="tv-shell">
+          <div class="tv-shell" id="tv-shell">
             <div class="tv-screen tv-glass" id="tv-screen">
               <div class="static" id="tv-static"></div>
               <div class="wipe" id="tv-wipe"></div>
@@ -465,7 +476,9 @@
                       <div class="title" id="item-title">—</div>
                       <div class="desc" id="item-desc">—</div>
                       <div class="actions">
-                        <button class="btn" id="btn-random">🎲 Random</button>
+                        <button class="btn" id="btn-prev">◀ Prev</button>
+                        <span id="pos" style="align-self:center; opacity:.8"></span>
+                        <button class="btn" id="btn-next">Next ▶</button>
                         <button class="btn" id="btn-guide">📋 View All</button>
                         <button class="btn" id="btn-power">⏻ Off</button>
                       </div>
@@ -481,13 +494,16 @@
                 </div>
               </div>
             </div>
+            <div id="calib" style="display:none; position:absolute; left:var(--tv-screen-left); top:var(--tv-screen-top); width:var(--tv-screen-width); height:var(--tv-screen-height); outline:2px dashed #7dd3fc; border-radius:18px; box-shadow:0 0 0 9999px rgba(0,0,0,.0); pointer-events:none;">
+              <div id="calib-label" style="position:absolute; right:-8px; top:-26px; background:#0f141e; border:1px solid #243049; color:#dce6ff; padding:4px 8px; border-radius:8px; font-size:12px;">L:— T:— W:— H:— (arrows to move, Shift=width, Alt=height, S=save, C=copy, Esc=exit)</div>
+            </div>
           </div>
 
           <aside class="controls" id="knobs" aria-label="Remote control">
             <div class="remote-top">
               <button class="btn-round" id="power-remote" title="Power">⏻</button>
-              <button class="btn-round" id="prev-ch" title="Prev">◀</button>
-              <button class="btn-round" id="next-ch" title="Next">▶</button>
+              <button class="btn-round" id="prev-item" title="Prev item">◀</button>
+              <button class="btn-round" id="next-item" title="Next item">▶</button>
             </div>
             <div class="remote-section">
               ${CHANNELS.map(c=>`<button class="knob" data-ch="${c.id}">CH ${c.number} — ${c.name}</button>`).join('')}
@@ -509,6 +525,7 @@
       modal.style.display = 'flex';
       modal.setAttribute('aria-hidden','false');
 
+      const tvShell = document.getElementById('tv-shell');
       const screen = document.getElementById('tv-screen');
       const chBadge = document.getElementById('ch-badge');
       const titleEl = document.getElementById('tv-title');
@@ -517,12 +534,12 @@
       const poster = document.getElementById('poster');
       const itemTitle = document.getElementById('item-title');
       const itemDesc = document.getElementById('item-desc');
+      const pos = document.getElementById('pos');
       const guide = document.getElementById('guide');
       const guideGrid = document.getElementById('guide-grid');
       const knobs = document.getElementById('knobs');
 
       function saveState(){ localStorage.setItem('tvState', JSON.stringify({channel: currentChannel, sub: currentSub})); }
-
       function huePoster(){ poster.style.filter = `hue-rotate(${Math.floor(Math.random()*360)}deg)`; }
       function setActiveKnob(){ [...knobs.querySelectorAll('.knob')].forEach(k => k.classList.toggle('active', k.dataset.ch === currentChannel)); }
 
@@ -534,7 +551,7 @@
           b.className = 'pill' + (st.id===currentSub ? ' active':'');
           b.textContent = st.name;
           b.dataset.sub = st.id;
-          b.onclick = ()=>{ currentSub = st.id; flip(()=>renderContent()); saveState(); };
+          b.onclick = ()=>{ currentSub = st.id; currentIndex = 0; flip(()=>renderContent()); saveState(); };
           subtabsEl.appendChild(b);
         });
       }
@@ -559,50 +576,68 @@
 
       function drawItem(){
         const list = listForCurrent();
-        const pick = list[Math.floor(Math.random()*list.length)];
-        itemTitle.textContent = pick.title;
-        itemDesc.textContent = pick.desc;
-        huePoster();
+        if(list.length===0){ itemTitle.textContent = '—'; itemDesc.textContent=''; pos.textContent=''; return; }
+        if(currentIndex<0) currentIndex = list.length-1; if(currentIndex>=list.length) currentIndex=0;
+        const pick = list[currentIndex];
+        itemTitle.textContent = pick.title; itemDesc.textContent = pick.desc; pos.textContent = `${currentIndex+1} / ${list.length}`; huePoster();
       }
 
-      function flip(cb){
-        screen.classList.remove('flip'); void screen.offsetWidth; screen.classList.add('flip');
-        setTimeout(()=>{ cb && cb(); }, 260);
-      }
-
+      function flip(cb){ screen.classList.remove('flip'); void screen.offsetWidth; screen.classList.add('flip'); setTimeout(()=>{ cb && cb(); }, 260); }
       function renderContent(){ setActiveKnob(); renderSubtabs(); setLabels(); drawItem(); guide.classList.remove('show'); }
 
       // Initial render
       renderContent();
 
-      // Knob events
+      // Top arrow buttons cycle items (not channels)
+      document.getElementById('prev-item').onclick = ()=>{ currentIndex--; flip(drawItem); };
+      document.getElementById('next-item').onclick = ()=>{ currentIndex++; flip(drawItem); };
+
+      // CH buttons change channel; reset to #1 each time
       knobs.querySelectorAll('.knob').forEach(k=>{
         k.onclick = ()=>{
-          const next = k.dataset.ch;
-          if(next === currentChannel) return;
-          currentChannel = next;
-          if(currentChannel === 'movies' && !currentSub) currentSub = TV_DATA.movies.subTabs[0].id;
-          flip(()=>{ renderContent(); saveState(); });
+          const next = k.dataset.ch; if(next === currentChannel) return;
+          currentChannel = next; currentIndex = 0; if(currentChannel === 'movies' && !currentSub) currentSub = TV_DATA.movies.subTabs[0].id; flip(()=>{ renderContent(); saveState(); });
         };
       });
-
-      // Prev/Next/Power
-      document.getElementById('prev-ch').onclick = ()=>{ const i = CHANNELS.findIndex(c=>c.id===currentChannel); const next = CHANNELS[(i - 1 + CHANNELS.length) % CHANNELS.length].id; knobs.querySelector(`.knob[data-ch="${next}"]`).click(); };
-      document.getElementById('next-ch').onclick = ()=>{ const i = CHANNELS.findIndex(c=>c.id===currentChannel); const next = CHANNELS[(i + 1) % CHANNELS.length].id; knobs.querySelector(`.knob[data-ch="${next}"]`).click(); };
-      document.getElementById('power-remote').onclick = hideModal;
-      document.getElementById('btn-power').onclick = hideModal;
 
       // Numeric quick-select 1–5
       knobs.querySelectorAll('.remote-key').forEach(k=>{ k.onclick = ()=>{ const n = k.dataset.num; if(n>0 && n<=5){ const id = CHANNELS[n-1].id; knobs.querySelector(`.knob[data-ch="${id}"]`).click(); } } });
 
       // On-screen buttons
-      document.getElementById('btn-random').onclick = ()=> flip(drawItem);
+      document.getElementById('btn-prev').onclick = ()=>{ currentIndex--; flip(drawItem); };
+      document.getElementById('btn-next').onclick = ()=>{ currentIndex++; flip(drawItem); };
       document.getElementById('btn-guide').onclick = ()=>{ guide.classList.add('show'); const list = listForCurrent(); guideGrid.innerHTML = list.map((x,i)=>`<div class=\"item\"><div class=\"num\">#${i+1}</div><div class=\"title\">${x.title}</div><div class=\"desc\">${x.desc}</div></div>`).join(''); };
       document.getElementById('btn-guide-back').onclick = ()=> guide.classList.remove('show');
+      document.getElementById('btn-power').onclick = hideModal; document.getElementById('power-remote').onclick = hideModal;
 
-      // Keyboard shortcuts: 1-5 channels, arrows for prev/next, ESC power
-      function onKey(e){ if(modal.style.display !== 'flex') return; if(e.key >= '1' && e.key <= '5'){ const idx = Number(e.key)-1; const id = CHANNELS[idx]?.id; if(id){ knobs.querySelector(`.knob[data-ch=\"${id}\"]`).click(); } } else if(e.key === 'ArrowLeft'){ document.getElementById('prev-ch').click(); } else if(e.key === 'ArrowRight'){ document.getElementById('next-ch').click(); } }
+      // Keyboard: Left/Right items, digits for channels
+      function onKey(e){ if(modal.style.display !== 'flex') return; if(e.key === 'ArrowLeft'){ document.getElementById('prev-item').click(); } else if(e.key === 'ArrowRight'){ document.getElementById('next-item').click(); } else if(e.key >= '1' && e.key <= '5'){ const id = CHANNELS[Number(e.key)-1].id; knobs.querySelector(`.knob[data-ch=\"${id}\"]`).click(); } }
       document.addEventListener('keydown', onKey);
+
+      // Calibration mode: Alt+Click CH badge OR press 'c' to toggle overlay; arrows move; Shift width; Alt height
+      const calib = document.getElementById('calib');
+      const label = document.getElementById('calib-label');
+      let calibOn = false;
+      function readVars(){ const cs = getComputedStyle(document.documentElement); return { left: parseFloat(cs.getPropertyValue('--tv-screen-left')), top: parseFloat(cs.getPropertyValue('--tv-screen-top')), width: parseFloat(cs.getPropertyValue('--tv-screen-width')), height: parseFloat(cs.getPropertyValue('--tv-screen-height')) }; }
+      function writeVars(v){ const r = document.documentElement.style; r.setProperty('--tv-screen-left', v.left + '%'); r.setProperty('--tv-screen-top', v.top + '%'); r.setProperty('--tv-screen-width', v.width + '%'); r.setProperty('--tv-screen-height', v.height + '%'); updateLabel(v); }
+      function updateLabel(v){ label.textContent = `L:${v.left.toFixed(1)} T:${v.top.toFixed(1)} W:${v.width.toFixed(1)} H:${v.height.toFixed(1)} (arrows move, Shift=width, Alt=height, S=save, C=copy, Esc=exit)`; }
+      function toggleCalib(){ calibOn = !calibOn; calib.style.display = calibOn ? 'block' : 'none'; if(calibOn){ const v = readVars(); updateLabel(v);} }
+      chBadge.addEventListener('click', (e)=>{ if(e.altKey) toggleCalib(); });
+      document.addEventListener('keydown', (e)=>{
+        if(!calibOn) return;
+        const step = e.metaKey||e.ctrlKey ? 0.1 : (e.shiftKey||e.altKey ? 0.2 : 0.5);
+        const v = readVars();
+        if(!e.shiftKey && !e.altKey){ if(e.key==='ArrowLeft') v.left-=step; if(e.key==='ArrowRight') v.left+=step; if(e.key==='ArrowUp') v.top-=step; if(e.key==='ArrowDown') v.top+=step; }
+        if(e.shiftKey){ if(e.key==='ArrowLeft') v.width-=step; if(e.key==='ArrowRight') v.width+=step; }
+        if(e.altKey && !e.shiftKey){ if(e.key==='ArrowUp') v.height-=step; if(e.key==='ArrowDown') v.height+=step; }
+        if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){ e.preventDefault(); writeVars(v); }
+        if(e.key.toLowerCase()==='s'){ localStorage.setItem('tvBBox', JSON.stringify(v)); updateLabel(v); }
+        if(e.key.toLowerCase()==='c'){ const css = `--tv-screen-left: ${v.left}%;
+--tv-screen-top: ${v.top}%;
+--tv-screen-width: ${v.width}%;
+--tv-screen-height: ${v.height}%;`; navigator.clipboard?.writeText(css); updateLabel(v); }
+        if(e.key==='Escape'){ calibOn=false; calib.style.display='none'; }
+      });
 
       // Clean up listeners when closing modal
       const origHide = hideModal; hideModal = function(){ document.removeEventListener('keydown', onKey); origHide(); }
