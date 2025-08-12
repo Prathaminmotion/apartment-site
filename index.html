@@ -33,10 +33,10 @@
       --vignette-opa: 0;        /* vignette at night */
 
       /* TV positioning knobs (percentages tuned to tv.png) */
-      --tv-screen-left: 8.5%;
-      --tv-screen-top: 16.5%;
-      --tv-screen-width: 63.5%;
-      --tv-screen-height: 60.5%;
+      --tv-screen-left: 11.5%;
+      --tv-screen-top: 13.8%;
+      --tv-screen-width: 58.2%;
+      --tv-screen-height: 56.5%;
     }
     [data-theme="dawn"]{
       --bg:#0e1116; --panel:#171b21; --accent:#8be3ff;
@@ -124,24 +124,32 @@
        Retro TV — image-driven shell with layered screen
        Uses tv.png (square image). Content is placed in .tv-screen.
     ========================== */
-    .tv-wrap{ display:grid; grid-template-columns: 1fr 220px; gap:16px; align-items:stretch; }
+    .tv-wrap{ display:grid; grid-template-columns: 1fr 240px; gap:16px; align-items:stretch; }
 
     .tv-shell{ position:relative; width:min(90vw, 820px); aspect-ratio:1/1; background:url('tv.png') center/contain no-repeat; border-radius:20px; filter: drop-shadow(0 14px 34px rgba(0,0,0,.5)); }
 
     /* On-screen region aligned to the white CRT area of tv.png */
-    .tv-screen{ position:absolute; left:var(--tv-screen-left); top:var(--tv-screen-top); width:var(--tv-screen-width); height:var(--tv-screen-height); overflow:hidden; border-radius:18px; background:#0a0c10; box-shadow: inset 0 0 90px rgba(0,0,0,.75), inset 0 0 6px rgba(120,180,255,.25); }
+    .tv-screen{ position:absolute; left:var(--tv-screen-left); top:var(--tv-screen-top); width:var(--tv-screen-width); height:var(--tv-screen-height); overflow:hidden; border-radius:18px; background:#0a0c10; box-shadow: inset 0 0 90px rgba(0,0,0,.75), inset 0 0 6px rgba(120,180,255,.25); font-size: clamp(12px, 1.25vw, 16px); }
 
     /* Glass & scanline effects */
     .tv-glass:before{ content:""; position:absolute; inset:0; background: radial-gradient(90% 70% at 50% 35%, rgba(255,255,255,.08), transparent 60%), repeating-linear-gradient(180deg, rgba(255,255,255,.04) 0 2px, rgba(0,0,0,.04) 2px 4px); mix-blend-mode:soft-light; pointer-events:none; }
 
-    /* Screen inner layout */
-    .screen-inner{ position:absolute; inset:0; padding:16px 16px 12px; display:flex; flex-direction:column; gap:10px; color:#eaeef5; }
-    .ch-badge{ position:absolute; right:8px; top:8px; background: rgba(0,0,0,.55); color:#eaeef5; border:1px solid rgba(255,255,255,.15); font-size:12px; padding:4px 8px; border-radius:999px; }
-    .tv-h1{ font-weight:800; font-size:1.15rem; margin:0; }
-    .tv-sub{ color:#cfd9f0; margin:0 0 6px; font-size:.95rem; }
+    /* Screen inner layout becomes a 3-row grid so the guide can scroll */
+    .screen-inner{ position:absolute; inset:0; padding:12px; display:grid; grid-template-rows: auto auto 1fr; gap:10px; color:#eaeef5; }
+    .screen-head{ position:relative; display:flex; align-items:center; gap:10px; }
+    .ch-badge{ margin-left:auto; background: rgba(0,0,0,.55); color:#eaeef5; border:1px solid rgba(255,255,255,.15); font-size:12px; padding:4px 8px; border-radius:999px; }
+    .tv-h1{ font-weight:800; font-size:1rem; margin:0; }
+    .tv-sub{ color:#cfd9f0; margin:0; font-size:.9rem; }
 
-    .card{ display:flex; gap:14px; align-items:flex-start; border-radius:12px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); padding:12px; }
-    .poster{ width:100px; aspect-ratio:2/3; border-radius:10px; flex:0 0 auto; background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(0,0,0,.25)), linear-gradient(180deg,#8c76cb,#5b4f90); box-shadow:0 10px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.28); }
+    .remote-row{ display:flex; gap:8px; flex-wrap:wrap; }
+    .pill{ background:#232a39; border:1px solid #32405a; color:#dce6ff; border-radius:999px; padding:6px 10px; cursor:pointer; font-size:.85rem; }
+    .pill.active{ background:#e9c46a; color:#2f2618; border-color:#e9c46a }
+
+    /* Body area fills the remaining space */
+    .screen-body{ position:relative; min-height:0; overflow:hidden; }
+
+    .card{ display:flex; gap:12px; align-items:flex-start; border-radius:12px; background: rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); padding:10px; }
+    .poster{ width:90px; aspect-ratio:2/3; border-radius:10px; flex:0 0 auto; background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(0,0,0,.25)), linear-gradient(180deg,#8c76cb,#5b4f90); box-shadow:0 10px 18px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.28); }
     .title{ font-weight:700; margin-bottom:6px }
     .desc{ color:#e7dec7 }
 
@@ -149,17 +157,10 @@
     .btn{ background:#0f141e; color:#dce6ff; border:1px solid #243049; border-radius:10px; padding:8px 12px; cursor:pointer; }
     .btn:active{ transform:translateY(1px) }
 
-    /* Right-column remote & knobs */
-    .controls{ display:flex; flex-direction:column; gap:10px; background: linear-gradient(180deg, #1b1f27, #12151b); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px; min-width:0; }
-    .knob{ background: linear-gradient(180deg, #2a2f3a, #1a1f28); color:#d9e6ff; border:1px solid #313c52; border-radius:12px; padding:10px 12px; text-align:left; cursor:pointer; }
-    .knob.active{ outline:2px solid var(--accent); outline-offset:2px }
-    .remote-row{ display:flex; gap:8px; flex-wrap:wrap; }
-    .pill{ background:#232a39; border:1px solid #32405a; color:#dce6ff; border-radius:999px; padding:6px 10px; cursor:pointer; font-size:.88rem; }
-    .pill.active{ background:#e9c46a; color:#2f2618; border-color:#e9c46a }
-
-    .guide{ display:none; margin-top:8px }
-    .guide.show{ display:block }
-    .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:10px }
+    /* Guide fills screen-body and scrolls */
+    .guide{ position:absolute; inset:0; display:none; }
+    .guide.show{ display:block; }
+    .grid{ position:absolute; inset:44px 0 0 0; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:10px; padding-right:4px; }
     .item{ background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); padding:10px; border-radius:10px }
     .item .num{ color:#a9b6cf; font-size:.9rem }
 
@@ -172,8 +173,18 @@
     @keyframes fuzz{ 0%{opacity:1; transform:scale(1.02)} 90%{opacity:.9} 100%{opacity:0; transform:scale(1)} }
     @keyframes wipeDown{ 0%{opacity:1; transform:translateY(-100%)} 100%{opacity:0; transform:translateY(100%)} }
 
+    /* Remote look & feel */
+    .controls{ align-self:stretch; display:flex; flex-direction:column; gap:12px; background: linear-gradient(180deg, #171c26, #0f1218); border:1px solid rgba(255,255,255,.08); border-radius:28px; padding:14px; box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 8px 20px rgba(0,0,0,.4); }
+    .remote-top{ display:flex; justify-content:space-between; align-items:center; }
+    .btn-round{ width:38px; height:38px; border-radius:999px; border:1px solid #32405a; background:#232a39; color:#dce6ff; cursor:pointer; }
+    .remote-section{ background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:10px; }
+    .knob{ background: linear-gradient(180deg, #2a2f3a, #1a1f28); color:#d9e6ff; border:1px solid #313c52; border-radius:12px; padding:10px 12px; text-align:left; cursor:pointer; width:100%; }
+    .knob.active{ outline:2px solid var(--accent); outline-offset:2px }
+    .remote-nav{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; }
+    .remote-key{ background:#232a39; border:1px solid #32405a; color:#dce6ff; border-radius:12px; padding:8px 0; text-align:center; cursor:pointer; }
+
     /* Mobile: stack TV over controls */
-    @media (max-width: 900px){ .tv-wrap{ grid-template-columns: 1fr; } .controls{ order:2 } .tv-shell{ order:1; width:min(96vw, 680px); } }
+    @media (max-width: 900px){ .tv-wrap{ grid-template-columns: 1fr; } .controls{ order:2 } .tv-shell{ order:1; width:min(96vw, 680px); } } .controls{ order:2 } .tv-shell{ order:1; width:min(96vw, 680px); } }
   </style>
 </head>
 <body data-theme="day">
@@ -440,28 +451,32 @@
               <div class="static" id="tv-static"></div>
               <div class="wipe" id="tv-wipe"></div>
               <div class="screen-inner" id="screen-inner">
-                <span class="ch-badge" id="ch-badge">CH 1</span>
-                <h3 class="tv-h1" id="tv-title">Movies</h3>
+                <div class="screen-head">
+                  <h3 class="tv-h1" id="tv-title">Movies</h3>
+                  <span class="ch-badge" id="ch-badge">CH 1</span>
+                </div>
                 <p class="tv-sub" id="tv-sub">Flip channels or pick a sub‑channel.</p>
+                <div class="screen-body">
+                  <div class="remote-row" id="subtabs"></div>
 
-                <div class="remote-row" id="subtabs"></div>
-
-                <div class="card">
-                  <div class="poster" id="poster"></div>
-                  <div>
-                    <div class="title" id="item-title">—</div>
-                    <div class="desc" id="item-desc">—</div>
-                    <div class="actions">
-                      <button class="btn" id="btn-random">🎲 Random</button>
-                      <button class="btn" id="btn-guide">📋 View All</button>
-                      <button class="btn" id="btn-power">⏻ Off</button>
-                    </div>
-                    <div class="guide" id="guide">
-                      <div class="actions" style="margin:8px 0 6px">
-                        <button class="btn" id="btn-guide-back">⬅ Back</button>
+                  <div class="card" id="card">
+                    <div class="poster" id="poster"></div>
+                    <div>
+                      <div class="title" id="item-title">—</div>
+                      <div class="desc" id="item-desc">—</div>
+                      <div class="actions">
+                        <button class="btn" id="btn-random">🎲 Random</button>
+                        <button class="btn" id="btn-guide">📋 View All</button>
+                        <button class="btn" id="btn-power">⏻ Off</button>
                       </div>
-                      <div class="grid" id="guide-grid"></div>
                     </div>
+                  </div>
+
+                  <div class="guide" id="guide">
+                    <div class="actions" style="position:absolute;left:0;top:0;right:0;display:flex;justify-content:flex-end;gap:8px;padding:6px 0;">
+                      <button class="btn" id="btn-guide-back">⬅ Back</button>
+                    </div>
+                    <div class="grid" id="guide-grid"></div>
                   </div>
                 </div>
               </div>
@@ -469,11 +484,23 @@
           </div>
 
           <aside class="controls" id="knobs" aria-label="Remote control">
-            ${CHANNELS.map(c=>`<button class="knob" data-ch="${c.id}">CH ${c.number} — ${c.name}</button>`).join('')}
-            <div class="remote-row">
-              <button class="pill" id="prev-ch">◀ Prev</button>
-              <button class="pill" id="next-ch">Next ▶</button>
-              <button class="pill" id="power-remote">Power</button>
+            <div class="remote-top">
+              <button class="btn-round" id="power-remote" title="Power">⏻</button>
+              <button class="btn-round" id="prev-ch" title="Prev">◀</button>
+              <button class="btn-round" id="next-ch" title="Next">▶</button>
+            </div>
+            <div class="remote-section">
+              ${CHANNELS.map(c=>`<button class="knob" data-ch="${c.id}">CH ${c.number} — ${c.name}</button>`).join('')}
+            </div>
+            <div class="remote-section">
+              <div class="remote-nav">
+                <button class="remote-key" data-num="1">1</button>
+                <button class="remote-key" data-num="2">2</button>
+                <button class="remote-key" data-num="3">3</button>
+                <button class="remote-key" data-num="4">4</button>
+                <button class="remote-key" data-num="5">5</button>
+                <button class="remote-key" data-num="0">0</button>
+              </div>
             </div>
           </aside>
         </div>
@@ -483,8 +510,6 @@
       modal.setAttribute('aria-hidden','false');
 
       const screen = document.getElementById('tv-screen');
-      const staticEl = document.getElementById('tv-static');
-      const wipeEl = document.getElementById('tv-wipe');
       const chBadge = document.getElementById('ch-badge');
       const titleEl = document.getElementById('tv-title');
       const subEl = document.getElementById('tv-sub');
@@ -541,10 +566,7 @@
       }
 
       function flip(cb){
-        // Trigger visual effects
-        screen.classList.remove('flip');
-        void screen.offsetWidth; // reflow
-        screen.classList.add('flip');
+        screen.classList.remove('flip'); void screen.offsetWidth; screen.classList.add('flip');
         setTimeout(()=>{ cb && cb(); }, 260);
       }
 
@@ -564,45 +586,26 @@
         };
       });
 
-      // Prev/Next
-      document.getElementById('prev-ch').onclick = ()=>{
-        const i = CHANNELS.findIndex(c=>c.id===currentChannel);
-        const next = CHANNELS[(i - 1 + CHANNELS.length) % CHANNELS.length].id;
-        knobs.querySelector(`.knob[data-ch="${next}"]`).click();
-      };
-      document.getElementById('next-ch').onclick = ()=>{
-        const i = CHANNELS.findIndex(c=>c.id===currentChannel);
-        const next = CHANNELS[(i + 1) % CHANNELS.length].id;
-        knobs.querySelector(`.knob[data-ch="${next}"]`).click();
-      };
-
-      // Buttons on screen
-      document.getElementById('btn-random').onclick = ()=> flip(drawItem);
-      document.getElementById('btn-guide').onclick = ()=>{
-        guide.classList.add('show');
-        const list = listForCurrent();
-        guideGrid.innerHTML = list.map((x,i)=>`<div class="item"><div class="num">#${i+1}</div><div class="title">${x.title}</div><div class="desc">${x.desc}</div></div>`).join('');
-      };
-      document.getElementById('btn-guide-back').onclick = ()=> guide.classList.remove('show');
-      document.getElementById('btn-power').onclick = hideModal;
+      // Prev/Next/Power
+      document.getElementById('prev-ch').onclick = ()=>{ const i = CHANNELS.findIndex(c=>c.id===currentChannel); const next = CHANNELS[(i - 1 + CHANNELS.length) % CHANNELS.length].id; knobs.querySelector(`.knob[data-ch="${next}"]`).click(); };
+      document.getElementById('next-ch').onclick = ()=>{ const i = CHANNELS.findIndex(c=>c.id===currentChannel); const next = CHANNELS[(i + 1) % CHANNELS.length].id; knobs.querySelector(`.knob[data-ch="${next}"]`).click(); };
       document.getElementById('power-remote').onclick = hideModal;
+      document.getElementById('btn-power').onclick = hideModal;
+
+      // Numeric quick-select 1–5
+      knobs.querySelectorAll('.remote-key').forEach(k=>{ k.onclick = ()=>{ const n = k.dataset.num; if(n>0 && n<=5){ const id = CHANNELS[n-1].id; knobs.querySelector(`.knob[data-ch="${id}"]`).click(); } } });
+
+      // On-screen buttons
+      document.getElementById('btn-random').onclick = ()=> flip(drawItem);
+      document.getElementById('btn-guide').onclick = ()=>{ guide.classList.add('show'); const list = listForCurrent(); guideGrid.innerHTML = list.map((x,i)=>`<div class=\"item\"><div class=\"num\">#${i+1}</div><div class=\"title\">${x.title}</div><div class=\"desc\">${x.desc}</div></div>`).join(''); };
+      document.getElementById('btn-guide-back').onclick = ()=> guide.classList.remove('show');
 
       // Keyboard shortcuts: 1-5 channels, arrows for prev/next, ESC power
-      function onKey(e){
-        if(modal.style.display !== 'flex') return;
-        if(e.key >= '1' && e.key <= '5'){
-          const idx = Number(e.key)-1; const id = CHANNELS[idx]?.id; if(id){ knobs.querySelector(`.knob[data-ch="${id}"]`).click(); }
-        } else if(e.key === 'ArrowLeft'){ document.getElementById('prev-ch').click(); }
-        else if(e.key === 'ArrowRight'){ document.getElementById('next-ch').click(); }
-      }
+      function onKey(e){ if(modal.style.display !== 'flex') return; if(e.key >= '1' && e.key <= '5'){ const idx = Number(e.key)-1; const id = CHANNELS[idx]?.id; if(id){ knobs.querySelector(`.knob[data-ch=\"${id}\"]`).click(); } } else if(e.key === 'ArrowLeft'){ document.getElementById('prev-ch').click(); } else if(e.key === 'ArrowRight'){ document.getElementById('next-ch').click(); } }
       document.addEventListener('keydown', onKey);
 
       // Clean up listeners when closing modal
-      const origHide = hideModal;
-      hideModal = function(){
-        document.removeEventListener('keydown', onKey);
-        origHide();
-      }
+      const origHide = hideModal; hideModal = function(){ document.removeEventListener('keydown', onKey); origHide(); }
     }
   </script>
 </body>
