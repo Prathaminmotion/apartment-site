@@ -37,6 +37,9 @@
       --tv-screen-top: 31.9%;
       --tv-screen-width: 74.2%;
       --tv-screen-height: 43.7%;
+      --tv-ui-scale: 0.88; /* try 0.90–0.95; lower = smaller */
+
+
     }
     [data-theme="dawn"]{
       --bg:#0e1116; --panel:#171b21; --accent:#8be3ff;
@@ -152,7 +155,14 @@
     .tv-glass:before{ content:""; position:absolute; inset:0; background: radial-gradient(90% 70% at 50% 35%, rgba(255,255,255,.08), transparent 60%), repeating-linear-gradient(180deg, rgba(255,255,255,.04) 0 2px, rgba(0,0,0,.04) 2px 4px); mix-blend-mode:soft-light; pointer-events:none; }
 
     /* Screen layout */
-    .screen-inner{ position:absolute; inset:0; padding:12px; display:grid; grid-template-rows: auto auto 1fr; gap:10px; color:#eaeef5; }
+    .screen-inner{
+      position:absolute; inset:0; padding:12px;
+      display:grid; grid-template-rows:auto auto 1fr; gap:10px; color:#eaeef5;
+    
+      /* NEW: uniformly shrink everything on the screen */
+      transform: scale(var(--tv-ui-scale));
+      transform-origin: top left;   /* anchors to the top-left of the CRT */
+    }
     .screen-head{ position:relative; display:flex; align-items:center; gap:10px; }
     .ch-badge{ margin-left:auto; background: rgba(0,0,0,.55); color:#eaeef5; border:1px solid rgba(255,255,255,.15); font-size:12px; padding:4px 8px; border-radius:999px; }
     .tv-h1{ font-weight:800; font-size:1rem; margin:0; }
